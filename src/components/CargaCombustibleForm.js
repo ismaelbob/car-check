@@ -1,0 +1,455 @@
+import { useState, useEffect, useMemo } from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
+import { useVehiculos } from '../context/VehiculoContext';
+import { colors, typography, spacing } from '../theme';
+
+const TIPOS_COMBUSTIBLE = ['Gasolina', 'GNV', 'Gasolina premium', 'Diesel'];
+
+const PRECIOS = {
+  'Gasolina': 6.96,
+  'GNV': 3.72,
+  'Gasolina premium': 11.00,
+  'Diesel': 9.80,
+};
+
+const UNIDADES = {
+  'Gasolina': 'L',
+  'GNV': 'm3',
+  'Gasolina premium': 'L',
+  'Diesel': 'L',
+};
+
+const MAPEO_VEHICULO_A_CARGA = {
+  Gasolina: ['Gasolina', 'Gasolina premium'],
+  GNV: ['GNV'],
+  Diesel: ['Diesel'],
+};
+
+const formatDate = (d) => {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+export default function CargaCombustibleForm({ visible, onClose, vehiculoId, combustibles }) {
+  const { agregarCargaCombustible } = useVehiculos();
+  const [litros, setLitros] = useState('');
+  const [costo, setCosto] = useState('');
+  const [kilometraje, setKilometraje] = useState('');
+  const [tipoCombustible, setTipoCombustible] = useState('');
+  const [fecha, setFecha] = useState(formatDate(new Date()));
+  const [fechaDate, setFechaDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [tipoPickerVisible, setTipoPickerVisible] = useState(false);
+
+  const opcionesDisponibles = useMemo(() => {
+    if (!combustibles) return TIPOS_COMBUSTIBLE;
+    const tiposVehiculo = combustibles.split(',').map((s) => s.trim());
+    const opciones = new Set();
+    tiposVehiculo.forEach((tv) => {
+      const mapeadas = MAPEO_VEHICULO_A_CARGA[tv];
+      if (mapeadas) mapeadas.forEach((o) => opciones.add(o));
+    });
+    return TIPOS_COMBUSTIBLE.filter((t) => opciones.has(t));
+  }, [combustibles]);
+
+  const soloUnaOpcion = opcionesDisponibles.length === 1;
+
+  useEffect(() => {
+    if (soloUnaOpcion && opcionesDisponibles[0]) {
+      setTipoCombustible(opcionesDisponibles[0]);
+    }
+  }, [soloUnaOpcion]);
+
+  const unidad = tipoCombustible ? UNIDADES[tipoCombustible] : '';
+  const precioUnitario = tipoCombustible ? PRECIOS[tipoCombustible] : 0;
+
+  const calcularLitros = (costoStr) => {
+    if (!tipoCombustible || !costoStr) return '';
+    const costoNum = parseFloat(costoStr);
+    if (isNaN(costoNum)) return '';
+    return (costoNum / precioUnitario).toFixed(2);
+  };
+
+  const calcularCosto = (litrosStr) => {
+    if (!tipoCombustible || !litrosStr) return '';
+    const litrosNum = parseFloat(litrosStr);
+    if (isNaN(litrosNum)) return '';
+    return (litrosNum * precioUnitario).toFixed(2);
+  };
+
+  const handleTipoChange = (tipo) => {
+    setTipoCombustible(tipo);
+    setLitros('');
+    setCosto('');
+  };
+
+  const handleCostoChange = (val) => {
+    setCosto(val);
+    if (tipoCombustible && val) {
+      const calc = calcularLitros(val);
+      setLitros(calc);
+    } else {
+      setLitros('');
+    }
+  };
+
+  const handleLitrosChange = (val) => {
+    setLitros(val);
+    if (tipoCombustible && val) {
+      const calc = calcularCosto(val);
+      setCosto(calc);
+    } else {
+      setCosto('');
+    }
+  };
+
+  const resetForm = () => {
+    setLitros('');
+    setCosto('');
+    setKilometraje('');
+    setTipoCombustible('');
+    setFecha(formatDate(new Date()));
+    setFechaDate(new Date());
+  };
+
+  const handleSave = async () => {
+    if (!tipoCombustible || !litros || !costo || !kilometraje || !fecha) {
+      Alert.alert('Campos requeridos', 'Todos los campos son obligatorios');
+      return;
+    }
+
+    await agregarCargaCombustible({
+      vehiculo_id: vehiculoId,
+      litros: litros.trim(),
+      costo: costo.trim(),
+      kilometraje: kilometraje.trim(),
+      tipo_combustible: tipoCombustible,
+      fecha: fecha.trim(),
+    });
+
+    resetForm();
+    onClose();
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <Pressable style={styles.overlay} onPress={handleClose}>
+          <Pressable style={styles.sheet} onPress={() => {}}>
+            <View style={styles.handle} />
+            <Text style={styles.title}>Nueva carga de combustible</Text>
+
+            <ScrollView style={styles.form} keyboardShouldPersistTaps="handled">
+              <View style={styles.field}>
+                <Text style={styles.label}>Tipo de combustible *</Text>
+                {soloUnaOpcion ? (
+                  <View style={[styles.input, styles.inputDisabled]}>
+                    <Text style={styles.inputDisabledText}>{opcionesDisponibles[0]}</Text>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={[styles.input, styles.select]}
+                    onPress={() => setTipoPickerVisible(true)}
+                  >
+                    <Text style={[!tipoCombustible && { color: colors.textLight }]}>
+                      {tipoCombustible || 'Seleccionar tipo'}
+                    </Text>
+                    <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                )}
+                {tipoCombustible ? (
+                  <Text style={styles.priceInfo}>
+                    Precio: Bs {precioUnitario.toFixed(2)} / {unidad}
+                  </Text>
+                ) : null}
+              </View>
+
+              <View style={styles.row}>
+                <View style={[styles.field, styles.fieldHalf]}>
+                  <Text style={styles.label}>Litros / m3 *</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ej: 40"
+                    placeholderTextColor={colors.textLight}
+                    keyboardType="decimal-pad"
+                    value={litros}
+                    onChangeText={handleLitrosChange}
+                  />
+                </View>
+                <View style={[styles.field, styles.fieldHalf]}>
+                  <Text style={styles.label}>Costo total (Bs) *</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Ej: 278.40"
+                    placeholderTextColor={colors.textLight}
+                    keyboardType="decimal-pad"
+                    value={costo}
+                    onChangeText={handleCostoChange}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Kilometraje *</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ej: 50000"
+                  placeholderTextColor={colors.textLight}
+                  keyboardType="number-pad"
+                  value={kilometraje}
+                  onChangeText={setKilometraje}
+                />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={styles.label}>Fecha *</Text>
+                <TouchableOpacity
+                  style={styles.input}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={[!fecha && { color: colors.textLight }]}>
+                    {fecha || 'Seleccionar fecha'}
+                  </Text>
+                </TouchableOpacity>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={fechaDate}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={(event, selectedDate) => {
+                      setShowDatePicker(Platform.OS === 'ios');
+                      if (selectedDate) {
+                        setFechaDate(selectedDate);
+                        setFecha(formatDate(selectedDate));
+                      }
+                      if (Platform.OS === 'android') {
+                        setShowDatePicker(false);
+                      }
+                    }}
+                  />
+                )}
+              </View>
+
+              <TouchableOpacity style={styles.button} onPress={handleSave}>
+                <Ionicons name="checkmark-circle-outline" size={22} color={colors.white} />
+                <Text style={styles.buttonText}>Guardar</Text>
+              </TouchableOpacity>
+            </ScrollView>
+
+            <Modal visible={tipoPickerVisible} transparent animationType="fade" onRequestClose={() => setTipoPickerVisible(false)}>
+              <Pressable
+                style={styles.pickerOverlay}
+                onPress={() => setTipoPickerVisible(false)}
+              >
+                <Pressable style={styles.pickerSheet}>
+                  <Text style={styles.pickerTitle}>Tipo de combustible</Text>
+                  <FlatList
+                    data={opcionesDisponibles}
+                    keyExtractor={(item) => item}
+                    renderItem={({ item }) => (
+                      <TouchableOpacity
+                        style={[
+                          styles.pickerOption,
+                          item === tipoCombustible && styles.pickerOptionActive,
+                        ]}
+                        onPress={() => {
+                          handleTipoChange(item);
+                          setTipoPickerVisible(false);
+                        }}
+                      >
+                        <View style={styles.pickerOptionContent}>
+                          <Text
+                            style={[
+                              styles.pickerOptionText,
+                              item === tipoCombustible && styles.pickerOptionTextActive,
+                            ]}
+                          >
+                            {item}
+                          </Text>
+                          <Text style={styles.pickerOptionPrice}>
+                            Bs {PRECIOS[item].toFixed(2)} / {UNIDADES[item]}
+                          </Text>
+                        </View>
+                        {item === tipoCombustible && (
+                          <Ionicons name="checkmark" size={20} color={colors.primary} />
+                        )}
+                      </TouchableOpacity>
+                    )}
+                  />
+                </Pressable>
+              </Pressable>
+            </Modal>
+          </Pressable>
+        </Pressable>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  sheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '90%',
+    paddingBottom: spacing.xxl,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.border,
+    alignSelf: 'center',
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  title: {
+    ...typography.h3,
+    color: colors.textPrimary,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  form: {
+    paddingHorizontal: spacing.lg,
+  },
+  field: {
+    gap: spacing.xs,
+    marginBottom: spacing.md,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  fieldHalf: {
+    flex: 1,
+  },
+  label: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    fontWeight: '500',
+  },
+  input: {
+    ...typography.body,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 14,
+    color: colors.textPrimary,
+  },
+  select: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  inputDisabled: {
+    backgroundColor: colors.background,
+    opacity: 0.7,
+  },
+  inputDisabledText: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  priceInfo: {
+    ...typography.bodySmall,
+    color: colors.secondary,
+    fontWeight: '500',
+    marginTop: spacing.xs,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    borderRadius: 12,
+    paddingVertical: 16,
+    marginTop: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  buttonText: {
+    ...typography.button,
+    color: colors.white,
+  },
+  pickerOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  pickerSheet: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingVertical: spacing.md,
+    paddingBottom: spacing.xxl,
+    maxHeight: '60%',
+  },
+  pickerTitle: {
+    ...typography.h3,
+    color: colors.textPrimary,
+    textAlign: 'center',
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    marginHorizontal: spacing.lg,
+  },
+  pickerOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: spacing.lg,
+  },
+  pickerOptionActive: {
+    backgroundColor: colors.background,
+  },
+  pickerOptionContent: {
+    gap: 2,
+  },
+  pickerOptionText: {
+    ...typography.body,
+    color: colors.textPrimary,
+  },
+  pickerOptionTextActive: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  pickerOptionPrice: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+  },
+});

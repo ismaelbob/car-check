@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -33,6 +33,8 @@ const TIPOS_OPCIONES = [
   'Otro',
 ];
 
+const TIPOS_COMBUSTIBLE = ['Gasolina', 'GNV', 'Diesel'];
+
 export default function RegistroScreen() {
   const router = useRouter();
   const navigation = useNavigation();
@@ -54,6 +56,7 @@ export default function RegistroScreen() {
   const [placa, setPlaca] = useState('');
   const [kilometrajeInicial, setKilometrajeInicial] = useState('');
   const [foto, setFoto] = useState(null);
+  const [combustibles, setCombustibles] = useState([]);
   const [tipoPickerVisible, setTipoPickerVisible] = useState(false);
 
   useEffect(() => {
@@ -69,6 +72,9 @@ export default function RegistroScreen() {
           setPlaca(vehiculo.placa);
           setKilometrajeInicial(vehiculo.kilometrajeInicial);
           setFoto(vehiculo.foto || null);
+          setCombustibles(
+            vehiculo.combustible ? vehiculo.combustible.split(',').map((s) => s.trim()) : []
+          );
         }
       })();
     }
@@ -105,9 +111,20 @@ export default function RegistroScreen() {
     }
   };
 
+  const toggleCombustible = useCallback((item) => {
+    setCombustibles((prev) =>
+      prev.includes(item) ? prev.filter((c) => c !== item) : [...prev, item]
+    );
+  }, []);
+
   const handleGuardar = async () => {
     if (!marca.trim() || !modelo.trim() || !tipo.trim() || !año.trim() || !color.trim() || !placa.trim() || !kilometrajeInicial.trim()) {
       Alert.alert('Campos requeridos', 'Todos los campos son obligatorios');
+      return;
+    }
+
+    if (combustibles.length === 0) {
+      Alert.alert('Campo requerido', 'Selecciona al menos un tipo de combustible');
       return;
     }
 
@@ -120,6 +137,7 @@ export default function RegistroScreen() {
       placa: placa.trim(),
       kilometrajeInicial: kilometrajeInicial.trim(),
       foto: foto || null,
+      combustible: combustibles.join(','),
     };
 
     if (esEdicion) {
@@ -251,6 +269,27 @@ export default function RegistroScreen() {
               value={kilometrajeInicial}
               onChangeText={setKilometrajeInicial}
             />
+          </View>
+
+          <View style={styles.field}>
+            <Text style={styles.label}>Combustible</Text>
+            <View style={styles.chipsRow}>
+              {TIPOS_COMBUSTIBLE.map((item) => {
+                const active = combustibles.includes(item);
+                return (
+                  <TouchableOpacity
+                    key={item}
+                    style={[styles.chip, active && styles.chipActive]}
+                    onPress={() => toggleCombustible(item)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
 
           <TouchableOpacity style={styles.button} onPress={handleGuardar}>
@@ -432,6 +471,31 @@ const styles = StyleSheet.create({
   },
   pickerOptionTextActive: {
     color: colors.primary,
+    fontWeight: '600',
+  },
+  chipsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  chip: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.surface,
+  },
+  chipActive: {
+    borderColor: colors.secondary,
+    backgroundColor: colors.secondary + '15',
+  },
+  chipText: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  chipTextActive: {
+    color: colors.secondary,
     fontWeight: '600',
   },
   button: {

@@ -6,6 +6,8 @@ const VehiculoContext = createContext();
 export function VehiculoProvider({ children }) {
   const [vehiculos, setVehiculos] = useState([]);
   const [vehiculoActivo, setVehiculoActivo] = useState(0);
+  const [mantenimientos, setMantenimientos] = useState([]);
+  const [cargasCombustible, setCargasCombustible] = useState([]);
 
   const cargarVehiculos = useCallback(async () => {
     try {
@@ -48,6 +50,43 @@ export function VehiculoProvider({ children }) {
     setVehiculoActivo(index);
   }, []);
 
+  // ---- Historial ----
+
+  const cargarHistorial = useCallback(async (vehiculoId) => {
+    try {
+      const [mants, cargas] = await Promise.all([
+        db.obtenerMantenimientos(vehiculoId),
+        db.obtenerCargasCombustible(vehiculoId),
+      ]);
+      setMantenimientos(mants);
+      setCargasCombustible(cargas);
+    } catch (e) {
+      console.error('Error loading historial:', e);
+    }
+  }, []);
+
+  const agregarMantenimiento = useCallback(async (data) => {
+    const nuevo = { ...data, id: Date.now().toString() };
+    await db.insertarMantenimiento(nuevo);
+    await cargarHistorial(data.vehiculo_id);
+  }, [cargarHistorial]);
+
+  const eliminarMantenimiento = useCallback(async (id, vehiculoId) => {
+    await db.eliminarMantenimiento(id);
+    await cargarHistorial(vehiculoId);
+  }, [cargarHistorial]);
+
+  const agregarCargaCombustible = useCallback(async (data) => {
+    const nuevo = { ...data, id: Date.now().toString() };
+    await db.insertarCargaCombustible(nuevo);
+    await cargarHistorial(data.vehiculo_id);
+  }, [cargarHistorial]);
+
+  const eliminarCargaCombustible = useCallback(async (id, vehiculoId) => {
+    await db.eliminarCargaCombustible(id);
+    await cargarHistorial(vehiculoId);
+  }, [cargarHistorial]);
+
   return (
     <VehiculoContext.Provider
       value={{
@@ -58,6 +97,13 @@ export function VehiculoProvider({ children }) {
         actualizarVehiculo,
         eliminarVehiculo,
         obtenerVehiculoPorId,
+        mantenimientos,
+        cargasCombustible,
+        cargarHistorial,
+        agregarMantenimiento,
+        eliminarMantenimiento,
+        agregarCargaCombustible,
+        eliminarCargaCombustible,
       }}
     >
       {children}

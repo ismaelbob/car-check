@@ -61,6 +61,11 @@ export default function VehicleCard({ vehiculo }) {
         </View>
         <View style={styles.divider} />
         <View style={styles.row}>
+          <Text style={styles.label}>Combustible</Text>
+          <Text style={styles.value}>{vehiculo.combustible ? vehiculo.combustible.replace(/,/g, ' + ') : 'Gasolina'}</Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.row}>
           <Text style={styles.label}>Último kilometraje</Text>
           <Text style={styles.value}>{vehiculo.kilometrajeInicial} km</Text>
         </View>
