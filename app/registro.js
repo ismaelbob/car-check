@@ -58,17 +58,19 @@ export default function RegistroScreen() {
 
   useEffect(() => {
     if (id) {
-      const vehiculo = obtenerVehiculoPorId(id);
-      if (vehiculo) {
-        setMarca(vehiculo.marca);
-        setModelo(vehiculo.modelo);
-        setTipo(vehiculo.tipo);
-        setAño(vehiculo.año);
-        setColor(vehiculo.color);
-        setPlaca(vehiculo.placa);
-        setKilometrajeInicial(vehiculo.kilometrajeInicial);
-        setFoto(vehiculo.foto || null);
-      }
+      (async () => {
+        const vehiculo = await obtenerVehiculoPorId(id);
+        if (vehiculo) {
+          setMarca(vehiculo.marca);
+          setModelo(vehiculo.modelo);
+          setTipo(vehiculo.tipo);
+          setAño(vehiculo.año);
+          setColor(vehiculo.color);
+          setPlaca(vehiculo.placa);
+          setKilometrajeInicial(vehiculo.kilometrajeInicial);
+          setFoto(vehiculo.foto || null);
+        }
+      })();
     }
   }, [id]);
 
