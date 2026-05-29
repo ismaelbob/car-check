@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
+import ConfirmDeleteRecordModal from './ConfirmDeleteRecordModal';
 import { colors, typography, spacing } from '../theme';
 
 const ICONOS_TIPO = {
@@ -16,21 +18,9 @@ const ICONOS_TIPO = {
 
 export default function MantenimientoCard({ mantenimiento, vehiculoId }) {
   const { eliminarMantenimiento } = useVehiculos();
+  const [deleteVisible, setDeleteVisible] = useState(false);
 
-  const handleDelete = () => {
-    Alert.alert(
-      'Eliminar mantenimiento',
-      '¿Estás seguro de eliminar este registro?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => eliminarMantenimiento(mantenimiento.id, vehiculoId),
-        },
-      ]
-    );
-  };
+  const info = `${mantenimiento.tipo} — ${mantenimiento.kilometraje} km`;
 
   return (
     <View style={styles.card}>
@@ -43,7 +33,7 @@ export default function MantenimientoCard({ mantenimiento, vehiculoId }) {
           />
           <Text style={styles.tipo}>{mantenimiento.tipo}</Text>
         </View>
-        <TouchableOpacity onPress={handleDelete} hitSlop={10}>
+        <TouchableOpacity onPress={() => setDeleteVisible(true)} hitSlop={10}>
           <Ionicons name="trash-outline" size={18} color={colors.textLight} />
         </TouchableOpacity>
       </View>
@@ -75,6 +65,15 @@ export default function MantenimientoCard({ mantenimiento, vehiculoId }) {
           <Text style={styles.tallerText}>{mantenimiento.taller}</Text>
         </View>
       ) : null}
+
+      <ConfirmDeleteRecordModal
+        visible={deleteVisible}
+        recordId={mantenimiento.id}
+        tipo={mantenimiento.tipo}
+        info={info}
+        onClose={() => setDeleteVisible(false)}
+        onConfirm={(id) => eliminarMantenimiento(id, vehiculoId)}
+      />
     </View>
   );
 }

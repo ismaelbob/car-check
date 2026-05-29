@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
+import ConfirmDeleteRecordModal from './ConfirmDeleteRecordModal';
 import { colors, typography, spacing } from '../theme';
 
 const UNIDADES = {
@@ -12,36 +14,23 @@ const UNIDADES = {
 
 export default function CargaCombustibleCard({ carga, vehiculoId }) {
   const { eliminarCargaCombustible } = useVehiculos();
+  const [deleteVisible, setDeleteVisible] = useState(false);
   const litros = parseFloat(carga.litros) || 0;
   const costoTotal = parseFloat(carga.costo) || 0;
   const unidad = UNIDADES[carga.tipo_combustible] || 'L';
   const precioPorLitro = litros > 0 ? (costoTotal / litros).toFixed(2) : '—';
 
-  const handleDelete = () => {
-    Alert.alert(
-      'Eliminar carga',
-      '¿Estás seguro de eliminar este registro?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Eliminar',
-          style: 'destructive',
-          onPress: () => eliminarCargaCombustible(carga.id, vehiculoId),
-        },
-      ]
-    );
-  };
+  const tipo = carga.tipo_combustible || 'Combustible';
+  const info = `${tipo} — ${carga.litros} ${unidad}`;
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View style={styles.tipoRow}>
           <Ionicons name="flame-outline" size={22} color={colors.warning} />
-          <Text style={styles.tipo}>
-            {carga.tipo_combustible || 'Combustible'}
-          </Text>
+          <Text style={styles.tipo}>{tipo}</Text>
         </View>
-        <TouchableOpacity onPress={handleDelete} hitSlop={10}>
+        <TouchableOpacity onPress={() => setDeleteVisible(true)} hitSlop={10}>
           <Ionicons name="trash-outline" size={18} color={colors.textLight} />
         </TouchableOpacity>
       </View>
@@ -65,6 +54,15 @@ export default function CargaCombustibleCard({ carga, vehiculoId }) {
           <Text style={styles.detailText}>Bs {precioPorLitro}/{unidad}</Text>
         </View>
       </View>
+
+      <ConfirmDeleteRecordModal
+        visible={deleteVisible}
+        recordId={carga.id}
+        tipo={tipo}
+        info={info}
+        onClose={() => setDeleteVisible(false)}
+        onConfirm={(id) => eliminarCargaCombustible(id, vehiculoId)}
+      />
     </View>
   );
 }

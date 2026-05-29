@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -36,7 +36,7 @@ const formatDate = (d) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export default function MantenimientoForm({ visible, onClose, vehiculoId }) {
+export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimoKilometraje }) {
   const { agregarMantenimiento } = useVehiculos();
   const [tipo, setTipo] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -48,11 +48,17 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId }) {
   const [taller, setTaller] = useState('');
   const [tipoPickerVisible, setTipoPickerVisible] = useState(false);
 
+  useEffect(() => {
+    if (visible && ultimoKilometraje) {
+      setKilometraje(ultimoKilometraje);
+    }
+  }, [visible, ultimoKilometraje]);
+
   const resetForm = () => {
     setTipo('');
     setDescripcion('');
-    setKilometraje('');
-    setFecha('');
+    setKilometraje(ultimoKilometraje || '');
+    setFecha(formatDate(new Date()));
     setFechaDate(new Date());
     setCosto('');
     setTaller('');
@@ -61,6 +67,12 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId }) {
   const handleSave = async () => {
     if (!tipo || !kilometraje || !fecha) {
       Alert.alert('Campos requeridos', 'Tipo, kilometraje y fecha son obligatorios');
+      return;
+    }
+
+    const fechaDateObj = new Date(fecha + 'T00:00:00');
+    if (fechaDateObj > new Date()) {
+      Alert.alert('Fecha inválida', 'La fecha no puede ser futura');
       return;
     }
 
@@ -147,6 +159,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId }) {
                   <DateTimePicker
                     value={fechaDate}
                     mode="date"
+                    maximumDate={new Date()}
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={(event, selectedDate) => {
                       setShowDatePicker(Platform.OS === 'ios');

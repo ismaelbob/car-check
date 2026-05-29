@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -38,6 +38,15 @@ export default function HistorialScreen() {
       cargarHistorial(vehiculo.id);
     }
   }, [vehiculo?.id]);
+
+  const ultimoKilometraje = useMemo(() => {
+    if (!vehiculo) return '';
+    const kmInicial = parseFloat(vehiculo.kilometrajeInicial) || 0;
+    const kms = [kmInicial];
+    mantenimientos.forEach((m) => kms.push(parseFloat(m.kilometraje) || 0));
+    cargasCombustible.forEach((c) => kms.push(parseFloat(c.kilometraje) || 0));
+    return Math.max(...kms).toString();
+  }, [vehiculo?.kilometrajeInicial, mantenimientos, cargasCombustible]);
 
   const registros = tabActivo === 0 ? mantenimientos : cargasCombustible;
   const hayRegistros = registros.length > 0;
@@ -132,6 +141,7 @@ export default function HistorialScreen() {
         visible={mantFormVisible}
         onClose={() => setMantFormVisible(false)}
         vehiculoId={vehiculo.id}
+        ultimoKilometraje={ultimoKilometraje}
       />
 
       <CargaCombustibleForm
@@ -139,6 +149,7 @@ export default function HistorialScreen() {
         onClose={() => setCargaFormVisible(false)}
         vehiculoId={vehiculo.id}
         combustibles={vehiculo.combustible}
+        ultimoKilometraje={ultimoKilometraje}
       />
     </View>
   );

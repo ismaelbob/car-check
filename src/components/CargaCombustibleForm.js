@@ -47,7 +47,7 @@ const formatDate = (d) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export default function CargaCombustibleForm({ visible, onClose, vehiculoId, combustibles }) {
+export default function CargaCombustibleForm({ visible, onClose, vehiculoId, combustibles, ultimoKilometraje }) {
   const { agregarCargaCombustible } = useVehiculos();
   const [litros, setLitros] = useState('');
   const [costo, setCosto] = useState('');
@@ -72,10 +72,23 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
   const soloUnaOpcion = opcionesDisponibles.length === 1;
 
   useEffect(() => {
-    if (soloUnaOpcion && opcionesDisponibles[0]) {
+    if (opcionesDisponibles.length === 0) return;
+
+    const prioridad = ['GNV', 'Gasolina', 'Diesel'];
+    const defaultTipo = prioridad.find((p) => opcionesDisponibles.includes(p));
+
+    if (defaultTipo) {
+      setTipoCombustible(defaultTipo);
+    } else if (soloUnaOpcion) {
       setTipoCombustible(opcionesDisponibles[0]);
     }
-  }, [soloUnaOpcion]);
+  }, [opcionesDisponibles]);
+
+  useEffect(() => {
+    if (visible && ultimoKilometraje) {
+      setKilometraje(ultimoKilometraje);
+    }
+  }, [visible, ultimoKilometraje]);
 
   const unidad = tipoCombustible ? UNIDADES[tipoCombustible] : '';
   const precioUnitario = tipoCombustible ? PRECIOS[tipoCombustible] : 0;
@@ -123,7 +136,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
   const resetForm = () => {
     setLitros('');
     setCosto('');
-    setKilometraje('');
+    setKilometraje(ultimoKilometraje || '');
     setTipoCombustible('');
     setFecha(formatDate(new Date()));
     setFechaDate(new Date());
@@ -132,6 +145,12 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
   const handleSave = async () => {
     if (!tipoCombustible || !litros || !costo || !kilometraje || !fecha) {
       Alert.alert('Campos requeridos', 'Todos los campos son obligatorios');
+      return;
+    }
+
+    const fechaDateObj = new Date(fecha + 'T00:00:00');
+    if (fechaDateObj > new Date()) {
+      Alert.alert('Fecha inválida', 'La fecha no puede ser futura');
       return;
     }
 
@@ -240,6 +259,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
                   <DateTimePicker
                     value={fechaDate}
                     mode="date"
+                    maximumDate={new Date()}
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={(event, selectedDate) => {
                       setShowDatePicker(Platform.OS === 'ios');
