@@ -16,18 +16,8 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
+import { useConfig } from '../context/ConfigContext';
 import { colors, typography, spacing } from '../theme';
-
-const TIPOS_MANTENIMIENTO = [
-  'Aceite',
-  'Frenos',
-  'Llantas',
-  'Afinación',
-  'Batería',
-  'Transmisión',
-  'Suspensión',
-  'Otro',
-];
 
 const formatDate = (d) => {
   const yyyy = d.getFullYear();
@@ -38,6 +28,7 @@ const formatDate = (d) => {
 
 export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimoKilometraje }) {
   const { agregarMantenimiento } = useVehiculos();
+  const { tiposMantenimiento, moneda } = useConfig();
   const [tipo, setTipo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [kilometraje, setKilometraje] = useState('');
@@ -177,7 +168,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
 
               <View style={styles.row}>
                 <View style={[styles.field, styles.fieldHalf]}>
-                  <Text style={styles.label}>Costo (Bs)</Text>
+                  <Text style={styles.label}>Costo ({moneda})</Text>
                   <TextInput
                     style={styles.input}
                     placeholder="Ej: 850"
@@ -213,7 +204,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                 <Pressable style={styles.pickerSheet}>
                   <Text style={styles.pickerTitle}>Seleccionar tipo</Text>
                   <FlatList
-                    data={TIPOS_MANTENIMIENTO}
+                    data={tiposMantenimiento.map((t) => t.nombre)}
                     keyExtractor={(item) => item}
                     renderItem={({ item }) => (
                       <TouchableOpacity

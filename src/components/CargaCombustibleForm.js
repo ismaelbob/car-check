@@ -16,29 +16,8 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
+import { useConfig } from '../context/ConfigContext';
 import { colors, typography, spacing } from '../theme';
-
-const TIPOS_COMBUSTIBLE = ['Gasolina', 'GNV', 'Gasolina premium', 'Diesel'];
-
-const PRECIOS = {
-  'Gasolina': 6.96,
-  'GNV': 3.72,
-  'Gasolina premium': 11.00,
-  'Diesel': 9.80,
-};
-
-const UNIDADES = {
-  'Gasolina': 'L',
-  'GNV': 'm3',
-  'Gasolina premium': 'L',
-  'Diesel': 'L',
-};
-
-const MAPEO_VEHICULO_A_CARGA = {
-  Gasolina: ['Gasolina', 'Gasolina premium'],
-  GNV: ['GNV'],
-  Diesel: ['Diesel'],
-};
 
 const formatDate = (d) => {
   const yyyy = d.getFullYear();
@@ -47,8 +26,9 @@ const formatDate = (d) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export default function CargaCombustibleForm({ visible, onClose, vehiculoId, combustibles, ultimoKilometraje }) {
+export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ultimoKilometraje }) {
   const { agregarCargaCombustible } = useVehiculos();
+  const { combustibles, moneda } = useConfig();
   const [litros, setLitros] = useState('');
   const [costo, setCosto] = useState('');
   const [kilometraje, setKilometraje] = useState('');
@@ -58,31 +38,28 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tipoPickerVisible, setTipoPickerVisible] = useState(false);
 
-  const opcionesDisponibles = useMemo(() => {
-    if (!combustibles) return TIPOS_COMBUSTIBLE;
-    const tiposVehiculo = combustibles.split(',').map((s) => s.trim());
-    const opciones = new Set();
-    tiposVehiculo.forEach((tv) => {
-      const mapeadas = MAPEO_VEHICULO_A_CARGA[tv];
-      if (mapeadas) mapeadas.forEach((o) => opciones.add(o));
-    });
-    return TIPOS_COMBUSTIBLE.filter((t) => opciones.has(t));
+  const combNombres = useMemo(() => combustibles.map((c) => c.nombre), [combustibles]);
+
+  const combLookup = useMemo(() => {
+    const map = {};
+    combustibles.forEach((c) => { map[c.nombre] = c; });
+    return map;
   }, [combustibles]);
 
-  const soloUnaOpcion = opcionesDisponibles.length === 1;
+  const soloUnaOpcion = combNombres.length === 1;
 
   useEffect(() => {
-    if (opcionesDisponibles.length === 0) return;
-
-    const prioridad = ['GNV', 'Gasolina', 'Diesel'];
-    const defaultTipo = prioridad.find((p) => opcionesDisponibles.includes(p));
-
-    if (defaultTipo) {
-      setTipoCombustible(defaultTipo);
-    } else if (soloUnaOpcion) {
-      setTipoCombustible(opcionesDisponibles[0]);
+    if (combNombres.length === 0) return;
+    if (!tipoCombustible || !combLookup[tipoCombustible]) {
+      const prioridad = ['GNV', 'Gasolina', 'Diesel'];
+      const defaultTipo = prioridad.find((p) => combNombres.includes(p));
+      if (defaultTipo) {
+        setTipoCombustible(defaultTipo);
+      } else if (soloUnaOpcion) {
+        setTipoCombustible(combNombres[0]);
+      }
     }
-  }, [opcionesDisponibles]);
+  }, [combNombres]);
 
   useEffect(() => {
     if (visible && ultimoKilometraje) {
@@ -90,8 +67,9 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
     }
   }, [visible, ultimoKilometraje]);
 
-  const unidad = tipoCombustible ? UNIDADES[tipoCombustible] : '';
-  const precioUnitario = tipoCombustible ? PRECIOS[tipoCombustible] : 0;
+  const combustibleActual = tipoCombustible ? combLookup[tipoCombustible] : null;
+  const unidad = combustibleActual ? combustibleActual.unidad : '';
+  const precioUnitario = combustibleActual ? combustibleActual.precio : 0;
 
   const calcularLitros = (costoStr) => {
     if (!tipoCombustible || !costoStr) return '';
@@ -188,7 +166,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
                 <Text style={styles.label}>Tipo de combustible *</Text>
                 {soloUnaOpcion ? (
                   <View style={[styles.input, styles.inputDisabled]}>
-                    <Text style={styles.inputDisabledText}>{opcionesDisponibles[0]}</Text>
+                    <Text style={styles.inputDisabledText}>{combNombres[0]}</Text>
                   </View>
                 ) : (
                   <TouchableOpacity
@@ -203,7 +181,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
                 )}
                 {tipoCombustible ? (
                   <Text style={styles.priceInfo}>
-                    Precio: Bs {precioUnitario.toFixed(2)} / {unidad}
+                    Precio: {moneda} {precioUnitario.toFixed(2)} / {unidad}
                   </Text>
                 ) : null}
               </View>
@@ -221,7 +199,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
                   />
                 </View>
                 <View style={[styles.field, styles.fieldHalf]}>
-                  <Text style={styles.label}>Costo total (Bs) *</Text>
+                  <Text style={styles.label}>Costo total ({moneda}) *</Text>
                   <TextInput
                     style={styles.input}
                     placeholder="Ej: 278.40"
@@ -289,37 +267,42 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, com
                 <Pressable style={styles.pickerSheet}>
                   <Text style={styles.pickerTitle}>Tipo de combustible</Text>
                   <FlatList
-                    data={opcionesDisponibles}
+                    data={combNombres}
                     keyExtractor={(item) => item}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity
-                        style={[
-                          styles.pickerOption,
-                          item === tipoCombustible && styles.pickerOptionActive,
-                        ]}
-                        onPress={() => {
-                          handleTipoChange(item);
-                          setTipoPickerVisible(false);
-                        }}
-                      >
-                        <View style={styles.pickerOptionContent}>
-                          <Text
-                            style={[
-                              styles.pickerOptionText,
-                              item === tipoCombustible && styles.pickerOptionTextActive,
-                            ]}
-                          >
-                            {item}
-                          </Text>
-                          <Text style={styles.pickerOptionPrice}>
-                            Bs {PRECIOS[item].toFixed(2)} / {UNIDADES[item]}
-                          </Text>
-                        </View>
-                        {item === tipoCombustible && (
-                          <Ionicons name="checkmark" size={20} color={colors.primary} />
-                        )}
-                      </TouchableOpacity>
-                    )}
+                    renderItem={({ item }) => {
+                      const c = combLookup[item];
+                      return (
+                        <TouchableOpacity
+                          style={[
+                            styles.pickerOption,
+                            item === tipoCombustible && styles.pickerOptionActive,
+                          ]}
+                          onPress={() => {
+                            handleTipoChange(item);
+                            setTipoPickerVisible(false);
+                          }}
+                        >
+                          <View style={styles.pickerOptionContent}>
+                            <Text
+                              style={[
+                                styles.pickerOptionText,
+                                item === tipoCombustible && styles.pickerOptionTextActive,
+                              ]}
+                            >
+                              {item}
+                            </Text>
+                            {c && (
+                              <Text style={styles.pickerOptionPrice}>
+                                {moneda} {c.precio.toFixed(2)} / {c.unidad}
+                              </Text>
+                            )}
+                          </View>
+                          {item === tipoCombustible && (
+                            <Ionicons name="checkmark" size={20} color={colors.primary} />
+                          )}
+                        </TouchableOpacity>
+                      );
+                    }}
                   />
                 </Pressable>
               </Pressable>

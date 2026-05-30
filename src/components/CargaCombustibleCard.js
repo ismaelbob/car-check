@@ -1,23 +1,24 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
+import { useConfig } from '../context/ConfigContext';
 import ConfirmDeleteRecordModal from './ConfirmDeleteRecordModal';
 import { colors, typography, spacing } from '../theme';
 
-const UNIDADES = {
-  'Gasolina': 'L',
-  'GNV': 'm3',
-  'Gasolina premium': 'L',
-  'Diesel': 'L',
-};
-
 export default function CargaCombustibleCard({ carga, vehiculoId }) {
   const { eliminarCargaCombustible } = useVehiculos();
+  const { combustibles, moneda } = useConfig();
   const [deleteVisible, setDeleteVisible] = useState(false);
   const litros = parseFloat(carga.litros) || 0;
   const costoTotal = parseFloat(carga.costo) || 0;
-  const unidad = UNIDADES[carga.tipo_combustible] || 'L';
+  const combMap = useMemo(() => {
+    const m = {};
+    combustibles.forEach((c) => { m[c.nombre] = c; });
+    return m;
+  }, [combustibles]);
+  const combData = combMap[carga.tipo_combustible];
+  const unidad = combData ? combData.unidad : 'L';
   const precioPorLitro = litros > 0 ? (costoTotal / litros).toFixed(2) : '—';
 
   const tipo = carga.tipo_combustible || 'Combustible';
@@ -37,7 +38,7 @@ export default function CargaCombustibleCard({ carga, vehiculoId }) {
 
       <View style={styles.amountRow}>
         <Text style={styles.litros}>{carga.litros} {unidad}</Text>
-        <Text style={styles.total}>Bs {carga.costo}</Text>
+        <Text style={styles.total}>{moneda} {carga.costo}</Text>
       </View>
 
       <View style={styles.details}>
@@ -51,7 +52,7 @@ export default function CargaCombustibleCard({ carga, vehiculoId }) {
         </View>
         <View style={styles.detailItem}>
           <Ionicons name="pricetag-outline" size={14} color={colors.textSecondary} />
-          <Text style={styles.detailText}>Bs {precioPorLitro}/{unidad}</Text>
+          <Text style={styles.detailText}>{moneda} {precioPorLitro}/{unidad}</Text>
         </View>
       </View>
 

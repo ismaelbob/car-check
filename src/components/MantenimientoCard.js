@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
+import { useConfig } from '../context/ConfigContext';
 import ConfirmDeleteRecordModal from './ConfirmDeleteRecordModal';
 import { colors, typography, spacing } from '../theme';
 
@@ -18,6 +19,7 @@ const ICONOS_TIPO = {
 
 export default function MantenimientoCard({ mantenimiento, vehiculoId }) {
   const { eliminarMantenimiento } = useVehiculos();
+  const { moneda } = useConfig();
   const [deleteVisible, setDeleteVisible] = useState(false);
 
   const info = `${mantenimiento.tipo} — ${mantenimiento.kilometraje} km`;
@@ -54,7 +56,7 @@ export default function MantenimientoCard({ mantenimiento, vehiculoId }) {
         {mantenimiento.costo ? (
           <View style={styles.detailItem}>
             <Ionicons name="cash-outline" size={14} color={colors.textSecondary} />
-            <Text style={styles.detailText}>Bs {mantenimiento.costo}</Text>
+            <Text style={styles.detailText}>{moneda} {mantenimiento.costo}</Text>
           </View>
         ) : null}
       </View>

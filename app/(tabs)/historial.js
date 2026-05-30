@@ -148,7 +148,6 @@ export default function HistorialScreen() {
         visible={cargaFormVisible}
         onClose={() => setCargaFormVisible(false)}
         vehiculoId={vehiculo.id}
-        combustibles={vehiculo.combustible}
         ultimoKilometraje={ultimoKilometraje}
       />
     </View>

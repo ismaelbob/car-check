@@ -1,8 +1,11 @@
 import { Tabs } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../src/theme';
 
 export default function TabLayout() {
+  const router = useRouter();
   return (
     <Tabs
       initialRouteName="index"
@@ -42,6 +45,14 @@ export default function TabLayout() {
           headerTitle: 'Car Check',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="car-sport-outline" size={size} color={color} />
+          ),
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => router.push('/configuracion')}
+              style={{ marginRight: 16 }}
+            >
+              <Ionicons name="settings-outline" size={24} color={colors.white} />
+            </TouchableOpacity>
           ),
         }}
       />
