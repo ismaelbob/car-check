@@ -33,6 +33,41 @@ function formatDate(d) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+function formatTimeAgo(days) {
+  if (days < 30) {
+    return `hace ${days} ${days === 1 ? 'día' : 'días'}`;
+  }
+  const months = Math.round(days / 30.44);
+  if (months < 12) {
+    return `hace ${months} ${months === 1 ? 'mes' : 'meses'}`;
+  }
+  const years = Math.floor(days / 365.25);
+  const remainingMonths = Math.round((days - years * 365.25) / 30.44);
+  if (remainingMonths === 0) {
+    return `hace ${years} ${years === 1 ? 'año' : 'años'}`;
+  }
+  return `hace ${years} ${years === 1 ? 'año' : 'años'} y ${remainingMonths} ${remainingMonths === 1 ? 'mes' : 'meses'}`;
+}
+
+function formatTimeRemaining(days) {
+  const abs = Math.abs(days);
+  const prefix = days <= 0 ? 'excedido' : 'restantes';
+
+  if (abs < 30) {
+    return `${abs} ${abs === 1 ? 'día' : 'días'} ${prefix}`;
+  }
+  const months = Math.round(abs / 30.44);
+  if (months < 12) {
+    return `${months} ${months === 1 ? 'mes' : 'meses'} ${prefix}`;
+  }
+  const years = Math.floor(abs / 365.25);
+  const remainingMonths = Math.round((abs - years * 365.25) / 30.44);
+  if (remainingMonths === 0) {
+    return `${years} ${years === 1 ? 'año' : 'años'} ${prefix}`;
+  }
+  return `${years} ${years === 1 ? 'año' : 'años'} y ${remainingMonths} ${remainingMonths === 1 ? 'mes' : 'meses'} ${prefix}`;
+}
+
 export default function ProximosCambiosScreen() {
   const {
     vehiculos,
@@ -74,15 +109,15 @@ export default function ProximosCambiosScreen() {
 
       if (records.length < 2) {
         const r = records[0];
-        const mesesDesde = Math.round(
-          (new Date() - new Date(r.fecha + 'T00:00:00')) / (1000 * 60 * 60 * 24 * 30.44)
+        const diasDesde = Math.round(
+          (new Date() - new Date(r.fecha + 'T00:00:00')) / (1000 * 60 * 60 * 24)
         );
         results.push({
           tipo,
           hasPrediction: false,
           lastKm: parseFloat(r.kilometraje),
           lastDate: r.fecha,
-          mesesDesde,
+          diasDesde,
         });
         return;
       }
@@ -91,8 +126,8 @@ export default function ProximosCambiosScreen() {
 
       const last = records[records.length - 1];
       const lastKm = parseFloat(last.kilometraje);
-      const mesesDesde = Math.round(
-        (new Date() - new Date(last.fecha + 'T00:00:00')) / (1000 * 60 * 60 * 24 * 30.44)
+      const diasDesde = Math.round(
+        (new Date() - new Date(last.fecha + 'T00:00:00')) / (1000 * 60 * 60 * 24)
       );
 
       let totalKmDiff = 0;
@@ -115,7 +150,7 @@ export default function ProximosCambiosScreen() {
           hasPrediction: false,
           lastKm,
           lastDate: last.fecha,
-          mesesDesde,
+          diasDesde,
         });
         return;
       }
@@ -136,7 +171,7 @@ export default function ProximosCambiosScreen() {
         hasPrediction: true,
         lastKm,
         lastDate: last.fecha,
-        mesesDesde,
+        diasDesde,
         nextKm: Math.round(nextKm),
         nextDate: formatDate(nextDateObj),
         kmRemaining: Math.round(kmRemaining),
@@ -149,7 +184,7 @@ export default function ProximosCambiosScreen() {
 
     results.sort((a, b) => {
       if (a.hasPrediction !== b.hasPrediction) return a.hasPrediction ? -1 : 1;
-      if (!a.hasPrediction) return b.mesesDesde - a.mesesDesde;
+      if (!a.hasPrediction) return b.diasDesde - a.diasDesde;
       const aDone = a.kmRemaining <= 0 || a.daysRemaining <= 0 ? 0 : 1;
       const bDone = b.kmRemaining <= 0 || b.daysRemaining <= 0 ? 0 : 1;
       if (aDone !== bDone) return aDone - bDone;
@@ -255,7 +290,7 @@ export default function ProximosCambiosScreen() {
                   <Text style={styles.detailLabel}>Último cambio</Text>
                   <Text style={styles.detailValue}>{Number(item.lastKm).toLocaleString()} km</Text>
                   <Text style={styles.detailDate}>{item.lastDate}</Text>
-                  <Text style={styles.detailDate}>hace {item.mesesDesde} {item.mesesDesde === 1 ? 'mes' : 'meses'}</Text>
+                  <Text style={styles.detailDate}>{formatTimeAgo(item.diasDesde)}</Text>
                 </View>
                 {item.hasPrediction && (
                   <>
@@ -274,17 +309,13 @@ export default function ProximosCambiosScreen() {
                   <View style={styles.remainingItem}>
                     <Ionicons name="speedometer-outline" size={16} color={accentColor} />
                     <Text style={[styles.remainingText, isOverdue && styles.remainingOverdue]}>
-                      {isOverdue
-                        ? `${Number(Math.abs(item.kmRemaining)).toLocaleString()} km excedido`
-                        : `${Number(item.kmRemaining).toLocaleString()} km restantes`}
+                      {`${Number(Math.abs(item.kmRemaining)).toLocaleString()} km ${isOverdue ? 'excedido' : 'restantes'}`}
                     </Text>
                   </View>
                   <View style={styles.remainingItem}>
                     <Ionicons name="calendar-outline" size={16} color={accentColor} />
                     <Text style={[styles.remainingText, isOverdue && styles.remainingOverdue]}>
-                      {isOverdue
-                        ? `${Math.abs(item.daysRemaining)} días excedido`
-                        : `${item.daysRemaining} días restantes`}
+                      {formatTimeRemaining(item.daysRemaining)}
                     </Text>
                   </View>
                 </View>

@@ -6,7 +6,7 @@ import { useVehiculos } from '../context/VehiculoContext';
 import DeleteVehicleModal from './DeleteVehicleModal';
 import { colors, typography, spacing } from '../theme';
 
-export default function VehicleCard({ vehiculo }) {
+export default function VehicleCard({ vehiculo, ultimoKilometraje }) {
   const router = useRouter();
   const { eliminarVehiculo } = useVehiculos();
   const [menuVisible, setMenuVisible] = useState(false);
@@ -67,7 +67,7 @@ export default function VehicleCard({ vehiculo }) {
         <View style={styles.divider} />
         <View style={styles.row}>
           <Text style={styles.label}>Último kilometraje</Text>
-          <Text style={styles.value}>{vehiculo.kilometrajeInicial} km</Text>
+          <Text style={styles.value}>{ultimoKilometraje || vehiculo.kilometrajeInicial} km</Text>
         </View>
       </View>
 

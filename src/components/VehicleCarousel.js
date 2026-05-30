@@ -5,7 +5,7 @@ import { colors, spacing } from '../theme';
 
 const { width } = Dimensions.get('window');
 
-export default function VehicleCarousel({ vehiculos, vehiculoActivo, onIndexChange }) {
+export default function VehicleCarousel({ vehiculos, vehiculoActivo, onIndexChange, ultimoKilometraje = '' }) {
   const ref = useRef(null);
 
   const viewabilityConfig = useRef({
@@ -20,7 +20,7 @@ export default function VehicleCarousel({ vehiculos, vehiculoActivo, onIndexChan
 
   const renderItem = ({ item }) => (
     <View style={{ width }}>
-      <VehicleCard vehiculo={item} />
+      <VehicleCard vehiculo={item} ultimoKilometraje={ultimoKilometraje} />
     </View>
   );
 

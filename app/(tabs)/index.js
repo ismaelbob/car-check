@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +8,30 @@ import { colors, typography, spacing } from '../../src/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { vehiculos, vehiculoActivo, setVehiculoActivo } = useVehiculos();
+  const {
+    vehiculos,
+    vehiculoActivo,
+    setVehiculoActivo,
+    mantenimientos,
+    cargasCombustible,
+    cargarHistorial,
+  } = useVehiculos();
+
+  const vehiculo = vehiculos[vehiculoActivo];
+
+  useEffect(() => {
+    if (vehiculo) {
+      cargarHistorial(vehiculo.id);
+    }
+  }, [vehiculo?.id]);
+
+  const ultimoKilometraje = useMemo(() => {
+    if (!vehiculo) return '';
+    const kms = [parseFloat(vehiculo.kilometrajeInicial) || 0];
+    mantenimientos.forEach((m) => kms.push(parseFloat(m.kilometraje) || 0));
+    cargasCombustible.forEach((c) => kms.push(parseFloat(c.kilometraje) || 0));
+    return Math.max(...kms).toLocaleString();
+  }, [vehiculo?.kilometrajeInicial, mantenimientos, cargasCombustible]);
 
   if (vehiculos.length === 0) {
     return (
@@ -34,6 +58,7 @@ export default function HomeScreen() {
         vehiculos={vehiculos}
         vehiculoActivo={vehiculoActivo}
         onIndexChange={setVehiculoActivo}
+        ultimoKilometraje={ultimoKilometraje}
       />
 
       <TouchableOpacity
