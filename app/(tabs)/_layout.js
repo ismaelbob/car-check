@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../src/theme';
+import { colors, spacing } from '../../src/theme';
 
 export default function TabLayout() {
   const router = useRouter();
@@ -47,12 +47,14 @@ export default function TabLayout() {
             <Ionicons name="car-sport-outline" size={size} color={color} />
           ),
           headerRight: () => (
-            <TouchableOpacity
-              onPress={() => router.push('/configuracion')}
-              style={{ marginRight: 16 }}
-            >
-              <Ionicons name="settings-outline" size={24} color={colors.white} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', marginRight: 16, gap: spacing.md }}>
+              <TouchableOpacity onPress={() => router.push('/bienvenida')}>
+                <Ionicons name="home-outline" size={24} color={colors.white} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/configuracion')}>
+                <Ionicons name="settings-outline" size={24} color={colors.white} />
+              </TouchableOpacity>
+            </View>
           ),
         }}
       />
