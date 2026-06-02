@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../src/context/VehiculoContext';
@@ -19,77 +19,97 @@ export default function WelcomeScreen() {
 
   if (vehiculos.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <View style={styles.emptyBrand}>
-          <Ionicons name="car-sport-outline" size={80} color={colors.primary} />
-          <Text style={styles.appTitle}>Car Check</Text>
+      <View style={styles.wrapper}>
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyBrand}>
+            <Ionicons name="car-sport-outline" size={80} color={colors.primary} />
+            <Text style={styles.appTitle}>Car Check</Text>
+          </View>
+          <View style={styles.emptyBody}>
+            <Ionicons name="car-outline" size={64} color={colors.textLight} />
+            <Text style={styles.emptyTitle}>Bienvenido</Text>
+            <Text style={styles.emptySubtitle}>
+              Registra tu primer vehículo para comenzar
+            </Text>
+            <TouchableOpacity style={styles.button} onPress={handleAddVehicle}>
+              <Ionicons name="add-circle-outline" size={22} color={colors.white} />
+              <Text style={styles.buttonText}>Agregar vehículo</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.emptyBody}>
-          <Ionicons name="car-outline" size={64} color={colors.textLight} />
-          <Text style={styles.emptyTitle}>Bienvenido</Text>
-          <Text style={styles.emptySubtitle}>
-            Registra tu primer vehículo para comenzar
-          </Text>
-          <TouchableOpacity style={styles.button} onPress={handleAddVehicle}>
-            <Ionicons name="add-circle-outline" size={22} color={colors.white} />
-            <Text style={styles.buttonText}>Agregar vehículo</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.footer}
+          onPress={() => Linking.openURL('mailto:bobismaeljg@gmail.com')}
+        >
+          <Text style={styles.footerText}>Development by IsmaelBob</Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerIcon}>
-          <Ionicons name="car-sport-outline" size={36} color={colors.white} />
-        </Text>
-        <Text style={styles.headerTitle}>Car Check</Text>
-        <Text style={styles.headerSubtitle}>Selecciona un vehículo para ingresar</Text>
-      </View>
-      <FlatList
-        data={vehiculos}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <TouchableOpacity
-            style={styles.vehicleCard}
-            onPress={() => handleSelectVehicle(index)}
-            activeOpacity={0.7}
-          >
-            <View style={styles.vehiclePhoto}>
-              {item.foto ? (
-                <Image source={{ uri: item.foto }} style={styles.vehicleImage} />
-              ) : (
-                <Ionicons name="car-sport-outline" size={36} color={colors.primary} />
-              )}
-            </View>
-            <View style={styles.vehicleInfo}>
-              <Text style={styles.vehicleName}>
-                {item.marca} {item.modelo}
-              </Text>
-              <Text style={styles.vehicleDetail}>
-                {item.placa} · {item.año}
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={22} color={colors.textLight} />
-          </TouchableOpacity>
-        )}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-      />
+    <View style={styles.wrapper}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerIcon}>
+            <Ionicons name="car-sport-outline" size={36} color={colors.white} />
+          </Text>
+          <Text style={styles.headerTitle}>Car Check</Text>
+          <Text style={styles.headerSubtitle}>Selecciona un vehículo para ingresar</Text>
+        </View>
+        <FlatList
+          data={vehiculos}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              style={styles.vehicleCard}
+              onPress={() => handleSelectVehicle(index)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.vehiclePhoto}>
+                {item.foto ? (
+                  <Image source={{ uri: item.foto }} style={styles.vehicleImage} />
+                ) : (
+                  <Ionicons name="car-sport-outline" size={36} color={colors.primary} />
+                )}
+              </View>
+              <View style={styles.vehicleInfo}>
+                <Text style={styles.vehicleName}>
+                  {item.marca} {item.modelo}
+                </Text>
+                <Text style={styles.vehicleDetail}>
+                  {item.placa} · {item.año}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={22} color={colors.textLight} />
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+        />
 
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={handleAddVehicle}
+        >
+          <Ionicons name="add" size={28} color={colors.white} />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity
-        style={styles.fab}
-        onPress={handleAddVehicle}
+        style={styles.footer}
+        onPress={() => Linking.openURL('mailto:bobismaeljg@gmail.com')}
       >
-        <Ionicons name="add" size={28} color={colors.white} />
+        <Text style={styles.footerText}>Development by IsmaelBob</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -219,5 +239,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 8,
+  },
+  footer: {
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  footerText: {
+    ...typography.caption,
+    color: colors.textLight,
   },
 });
