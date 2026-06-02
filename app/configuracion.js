@@ -11,6 +11,8 @@ import {
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useConfig } from '../src/context/ConfigContext';
+import { useVehiculos } from '../src/context/VehiculoContext';
+import { exportarDatos, importarDatos } from '../src/export-import';
 import { colors, typography, spacing } from '../src/theme';
 
 const UNIDADES_OPCIONES = ['L', 'm3', 'kg', 'gal'];
@@ -29,6 +31,9 @@ export default function ConfiguracionScreen() {
     actualizarMoneda,
   } = useConfig();
 
+  const { recargarVehiculos } = useVehiculos();
+  const { recargarConfig } = useConfig();
+
   const [nuevoTipo, setNuevoTipo] = useState('');
   const [combEditId, setCombEditId] = useState(null);
   const [combNombre, setCombNombre] = useState('');
@@ -36,6 +41,8 @@ export default function ConfiguracionScreen() {
   const [combUnidad, setCombUnidad] = useState('L');
   const [showCombForm, setShowCombForm] = useState(false);
   const [monedaInput, setMonedaInput] = useState(moneda);
+  const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: 'Configuración' });
@@ -119,6 +126,47 @@ export default function ConfiguracionScreen() {
       return;
     }
     await actualizarMoneda(val);
+  };
+
+  const handleExportar = async () => {
+    setExporting(true);
+    try {
+      await exportarDatos();
+    } catch (e) {
+      Alert.alert('Error', e.message || 'No se pudo exportar los datos');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleImportar = async () => {
+    Alert.alert(
+      'Importar datos',
+      'Todos los datos actuales serán reemplazados por los del archivo. Esta acción no se puede deshacer. ¿Continuar?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Importar',
+          style: 'destructive',
+          onPress: async () => {
+            setImporting(true);
+            try {
+              const result = await importarDatos();
+              if (result.cancelled) {
+                setImporting(false);
+                return;
+              }
+              await Promise.all([recargarVehiculos(), recargarConfig()]);
+              Alert.alert('Importación exitosa', 'Los datos fueron importados correctamente');
+            } catch (e) {
+              Alert.alert('Error', e.message || 'No se pudo importar los datos');
+            } finally {
+              setImporting(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -278,6 +326,41 @@ export default function ConfiguracionScreen() {
           />
           <TouchableOpacity style={styles.saveMonedaBtn} onPress={handleGuardarMoneda}>
             <Ionicons name="checkmark" size={20} color={colors.white} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.divider} />
+
+      {/* === Exportar / Importar === */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="cloud-download-outline" size={20} color={colors.primary} />
+          <Text style={styles.sectionTitle}>Exportar / Importar</Text>
+        </View>
+        <Text style={styles.sectionDesc}>
+          Exporta todos tus datos como respaldo o impórtalos desde un archivo.
+        </Text>
+        <View style={styles.exportRow}>
+          <TouchableOpacity
+            style={[styles.exportBtn, exporting && styles.exportBtnDisabled]}
+            onPress={handleExportar}
+            disabled={exporting}
+          >
+            <Ionicons name="share-outline" size={20} color={colors.white} />
+            <Text style={styles.exportBtnText}>
+              {exporting ? 'Exportando…' : 'Exportar datos'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.exportBtn, styles.importBtn, importing && styles.exportBtnDisabled]}
+            onPress={handleImportar}
+            disabled={importing}
+          >
+            <Ionicons name="cloud-download-outline" size={20} color={colors.white} />
+            <Text style={styles.exportBtnText}>
+              {importing ? 'Importando…' : 'Importar datos'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -488,5 +571,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  exportRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  exportBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+  },
+  importBtn: {
+    backgroundColor: colors.secondary,
+  },
+  exportBtnDisabled: {
+    opacity: 0.6,
+  },
+  exportBtnText: {
+    ...typography.button,
+    color: colors.white,
   },
 });

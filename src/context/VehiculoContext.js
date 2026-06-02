@@ -93,6 +93,7 @@ export function VehiculoProvider({ children }) {
         vehiculos,
         vehiculoActivo,
         setVehiculoActivo: cambiarVehiculoActivo,
+        recargarVehiculos: cargarVehiculos,
         agregarVehiculo,
         actualizarVehiculo,
         eliminarVehiculo,

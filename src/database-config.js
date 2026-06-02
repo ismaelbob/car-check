@@ -114,6 +114,22 @@ export async function eliminarCombustible(id) {
   await database.runAsync('DELETE FROM combustibles WHERE id = ?', id);
 }
 
+// ---- Export / Import ----
+
+export async function obtenerTodasLasConfiguraciones() {
+  const database = await getDb();
+  return await database.getAllAsync('SELECT * FROM configuracion');
+}
+
+export async function limpiarDatosConfig() {
+  const database = await getDb();
+  await database.execAsync(`
+    DELETE FROM combustibles;
+    DELETE FROM tipos_mantenimiento;
+    DELETE FROM configuracion;
+  `);
+}
+
 // ---- Configuración simple ----
 
 export async function obtenerConfig(clave) {

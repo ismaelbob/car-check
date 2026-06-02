@@ -76,6 +76,7 @@ export function ConfigProvider({ children }) {
         tiposMantenimiento,
         combustibles,
         moneda,
+        recargarConfig: cargarConfig,
         agregarTipoMantenimiento,
         eliminarTipoMantenimiento,
         agregarCombustible,

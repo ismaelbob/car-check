@@ -154,3 +154,24 @@ export async function eliminarCargaCombustible(id) {
   const database = await getDb();
   await database.runAsync('DELETE FROM cargas_combustible WHERE id = ?', id);
 }
+
+// ---- Export / Import ----
+
+export async function obtenerTodosLosMantenimientos() {
+  const database = await getDb();
+  return await database.getAllAsync('SELECT * FROM mantenimientos ORDER BY fecha DESC');
+}
+
+export async function obtenerTodasLasCargasCombustible() {
+  const database = await getDb();
+  return await database.getAllAsync('SELECT * FROM cargas_combustible ORDER BY fecha DESC');
+}
+
+export async function limpiarDatosVehiculos() {
+  const database = await getDb();
+  await database.execAsync(`
+    DELETE FROM cargas_combustible;
+    DELETE FROM mantenimientos;
+    DELETE FROM vehiculos;
+  `);
+}
