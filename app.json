@@ -20,9 +20,11 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1B2A4A"
+        "backgroundColor": "#1B2A4A",
+        "package": "com.ismaelbob.carcheck"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.ismaelbob.carcheck"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -30,6 +32,12 @@
     "plugins": [
       "expo-router",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "480d0ec1-2de6-43e9-998c-e0b28ae68dac"
+      }
+    }
   }
 }
