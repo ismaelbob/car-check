@@ -41,6 +41,23 @@ async function getDb() {
         fecha TEXT NOT NULL,
         FOREIGN KEY (vehiculo_id) REFERENCES vehiculos(id) ON DELETE CASCADE
       );
+
+      CREATE TABLE IF NOT EXISTS configuracion (
+        clave TEXT PRIMARY KEY,
+        valor TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS tipos_mantenimiento (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL UNIQUE
+      );
+
+      CREATE TABLE IF NOT EXISTS combustibles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nombre TEXT NOT NULL UNIQUE,
+        precio REAL NOT NULL,
+        unidad TEXT NOT NULL
+      );
     `);
     try {
       await db.execAsync('ALTER TABLE vehiculos ADD COLUMN combustible TEXT DEFAULT \'Gasolina\'');
@@ -51,6 +68,8 @@ async function getDb() {
   return db;
 }
 
+export { getDb };
+
 export async function obtenerVehiculos() {
   const database = await getDb();
   return await database.getAllAsync('SELECT * FROM vehiculos ORDER BY rowid DESC');
@@ -58,7 +77,7 @@ export async function obtenerVehiculos() {
 
 export async function obtenerVehiculoPorId(id) {
   const database = await getDb();
-  return await database.getFirstAsync('SELECT * FROM vehiculos WHERE id = ?', id);
+  return await database.getFirstAsync('SELECT * FROM vehiculos WHERE id = ?', [id]);
 }
 
 export async function insertarVehiculo(vehiculo) {
@@ -104,7 +123,7 @@ export async function actualizarVehiculo(id, data) {
 
 export async function eliminarVehiculo(id) {
   const database = await getDb();
-  await database.runAsync('DELETE FROM vehiculos WHERE id = ?', id);
+  await database.runAsync('DELETE FROM vehiculos WHERE id = ?', [id]);
 }
 
 // ---- Mantenimientos ----
@@ -122,13 +141,13 @@ export async function obtenerMantenimientos(vehiculoId) {
   const database = await getDb();
   return await database.getAllAsync(
     'SELECT * FROM mantenimientos WHERE vehiculo_id = ? ORDER BY fecha DESC',
-    vehiculoId
+    [vehiculoId]
   );
 }
 
 export async function eliminarMantenimiento(id) {
   const database = await getDb();
-  await database.runAsync('DELETE FROM mantenimientos WHERE id = ?', id);
+  await database.runAsync('DELETE FROM mantenimientos WHERE id = ?', [id]);
 }
 
 // ---- Cargas de combustible ----
@@ -146,13 +165,13 @@ export async function obtenerCargasCombustible(vehiculoId) {
   const database = await getDb();
   return await database.getAllAsync(
     'SELECT * FROM cargas_combustible WHERE vehiculo_id = ? ORDER BY fecha DESC',
-    vehiculoId
+    [vehiculoId]
   );
 }
 
 export async function eliminarCargaCombustible(id) {
   const database = await getDb();
-  await database.runAsync('DELETE FROM cargas_combustible WHERE id = ?', id);
+  await database.runAsync('DELETE FROM cargas_combustible WHERE id = ?', [id]);
 }
 
 // ---- Export / Import ----

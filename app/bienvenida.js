@@ -1,20 +1,59 @@
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../src/context/VehiculoContext';
+import { useConfig } from '../src/context/ConfigContext';
+import { importarDatos } from '../src/export-import';
 import { colors, typography, spacing } from '../src/theme';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { vehiculos, setVehiculoActivo } = useVehiculos();
+  const { vehiculos, setVehiculoActivo, recargarVehiculos } = useVehiculos();
+  const { recargarConfig } = useConfig();
+  const [importing, setImporting] = useState(false);
 
   const handleSelectVehicle = (index) => {
     setVehiculoActivo(index);
     router.replace('/(tabs)/');
   };
 
+  const handleSettings = () => {
+    router.push('/configuracion');
+  };
+
   const handleAddVehicle = () => {
     router.push('/registro');
+  };
+
+  const handleImportar = async () => {
+    Alert.alert(
+      'Importar datos',
+      'Todos los datos actuales serán reemplazados por los del archivo. Esta acción no se puede deshacer. ¿Continuar?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Importar',
+          style: 'destructive',
+          onPress: async () => {
+            setImporting(true);
+            try {
+              const result = await importarDatos();
+              if (result.cancelled) {
+                setImporting(false);
+                return;
+              }
+              await Promise.all([recargarVehiculos(), recargarConfig()]);
+              Alert.alert('Importación exitosa', 'Los datos fueron importados correctamente');
+            } catch (e) {
+              Alert.alert('Error', e.message || 'No se pudo importar los datos');
+            } finally {
+              setImporting(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (vehiculos.length === 0) {
@@ -34,6 +73,16 @@ export default function WelcomeScreen() {
             <TouchableOpacity style={styles.button} onPress={handleAddVehicle}>
               <Ionicons name="add-circle-outline" size={22} color={colors.white} />
               <Text style={styles.buttonText}>Agregar vehículo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, styles.importBtn, importing && styles.importBtnDisabled]}
+              onPress={handleImportar}
+              disabled={importing}
+            >
+              <Ionicons name="cloud-download-outline" size={22} color={colors.white} />
+              <Text style={styles.buttonText}>
+                {importing ? 'Importando…' : 'Importar datos'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -88,12 +137,14 @@ export default function WelcomeScreen() {
           showsVerticalScrollIndicator={false}
         />
 
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={handleAddVehicle}
-        >
-          <Ionicons name="add" size={28} color={colors.white} />
-        </TouchableOpacity>
+        <View style={styles.fabContainer}>
+          <TouchableOpacity style={styles.fabSecondary} onPress={handleSettings}>
+            <Ionicons name="settings-outline" size={24} color={colors.white} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.fab} onPress={handleAddVehicle}>
+            <Ionicons name="add" size={28} color={colors.white} />
+          </TouchableOpacity>
+        </View>
       </View>
       <TouchableOpacity
         style={styles.footer}
@@ -220,18 +271,41 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: spacing.xl,
   },
+  importBtn: {
+    backgroundColor: colors.primary,
+  },
+  importBtnDisabled: {
+    opacity: 0.6,
+  },
   buttonText: {
     ...typography.button,
     color: colors.white,
   },
-  fab: {
+  fabContainer: {
     position: 'absolute',
     bottom: 24,
     right: 24,
+    alignItems: 'center',
+    gap: 12,
+  },
+  fab: {
     width: 56,
     height: 56,
     borderRadius: 28,
     backgroundColor: colors.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  fabSecondary: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

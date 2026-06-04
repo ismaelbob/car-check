@@ -26,7 +26,7 @@ const formatDate = (d) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ultimoKilometraje }) {
+export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ultimoKilometraje, vehiculoCombustible }) {
   const { agregarCargaCombustible } = useVehiculos();
   const { combustibles, moneda } = useConfig();
   const [litros, setLitros] = useState('');
@@ -46,20 +46,67 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
     return map;
   }, [combustibles]);
 
-  const soloUnaOpcion = combNombres.length === 1;
+  const vehiculoCombustibles = useMemo(() => {
+    if (!vehiculoCombustible) return [];
+    return vehiculoCombustible.split(',').map((s) => s.trim());
+  }, [vehiculoCombustible]);
+
+  const fuelCategory = useMemo(() => {
+    const hasDiesel = vehiculoCombustibles.includes('Diesel');
+    const hasGasolina = vehiculoCombustibles.includes('Gasolina');
+    const hasGNV = vehiculoCombustibles.includes('GNV');
+
+    if (hasDiesel) return 'diesel';
+    if (hasGNV && !hasGasolina) return 'gnv';
+    if (hasGasolina && hasGNV) return 'gasolina_gnv';
+    if (hasGasolina) return 'gasolina';
+    return 'unknown';
+  }, [vehiculoCombustibles]);
+
+  const filteredCombNombres = useMemo(() => {
+    switch (fuelCategory) {
+      case 'diesel':
+        return combNombres.filter((n) => n === 'Diesel');
+      case 'gnv':
+        return combNombres.filter((n) => n === 'GNV');
+      case 'gasolina':
+        return combNombres.filter((n) => n.includes('Gasolina'));
+      case 'gasolina_gnv':
+        return combNombres.filter((n) => n.includes('Gasolina') || n === 'GNV');
+      default:
+        return combNombres;
+    }
+  }, [fuelCategory, combNombres]);
+
+  const soloUnaOpcion = filteredCombNombres.length === 1;
 
   useEffect(() => {
-    if (combNombres.length === 0) return;
-    if (!tipoCombustible || !combLookup[tipoCombustible]) {
-      const prioridad = ['GNV', 'Gasolina', 'Diesel'];
-      const defaultTipo = prioridad.find((p) => combNombres.includes(p));
-      if (defaultTipo) {
+    if (filteredCombNombres.length === 0) return;
+    if (!tipoCombustible || !combLookup[tipoCombustible] || !filteredCombNombres.includes(tipoCombustible)) {
+      let defaultTipo;
+      switch (fuelCategory) {
+        case 'diesel':
+          defaultTipo = 'Diesel';
+          break;
+        case 'gnv':
+          defaultTipo = 'GNV';
+          break;
+        case 'gasolina':
+          defaultTipo = 'Gasolina';
+          break;
+        case 'gasolina_gnv':
+          defaultTipo = 'GNV';
+          break;
+        default:
+          defaultTipo = filteredCombNombres[0];
+      }
+      if (defaultTipo && filteredCombNombres.includes(defaultTipo)) {
         setTipoCombustible(defaultTipo);
-      } else if (soloUnaOpcion) {
-        setTipoCombustible(combNombres[0]);
+      } else {
+        setTipoCombustible(filteredCombNombres[0]);
       }
     }
-  }, [combNombres]);
+  }, [filteredCombNombres, fuelCategory]);
 
   useEffect(() => {
     if (visible && ultimoKilometraje) {
@@ -166,7 +213,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
                 <Text style={styles.label}>Tipo de combustible *</Text>
                 {soloUnaOpcion ? (
                   <View style={[styles.input, styles.inputDisabled]}>
-                    <Text style={styles.inputDisabledText}>{combNombres[0]}</Text>
+                    <Text style={styles.inputDisabledText}>{filteredCombNombres[0]}</Text>
                   </View>
                 ) : (
                   <TouchableOpacity
@@ -267,7 +314,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
                 <Pressable style={styles.pickerSheet}>
                   <Text style={styles.pickerTitle}>Tipo de combustible</Text>
                   <FlatList
-                    data={combNombres}
+                    data={filteredCombNombres}
                     keyExtractor={(item) => item}
                     renderItem={({ item }) => {
                       const c = combLookup[item];

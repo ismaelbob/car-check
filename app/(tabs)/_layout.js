@@ -1,11 +1,31 @@
-import { Tabs } from 'expo-router';
-import { TouchableOpacity, View } from 'react-native';
+import { Tabs, usePathname } from 'expo-router';
+import { TouchableOpacity, View, BackHandler } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
 import { colors, spacing } from '../../src/theme';
 
 export default function TabLayout() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const onBackPress = () => {
+      if (pathname === '/historial' || pathname === '/proximos-cambios') {
+        router.navigate('/');
+        return true;
+      }
+      if (pathname === '/') {
+        router.replace('/bienvenida');
+        return true;
+      }
+      return false;
+    };
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [pathname]);
+
   return (
     <Tabs
       initialRouteName="index"
@@ -42,17 +62,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Inicio',
-          headerTitle: 'Car Check',
+          headerTitle: 'Inicio',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="car-sport-outline" size={size} color={color} />
           ),
           headerRight: () => (
             <View style={{ flexDirection: 'row', marginRight: 16, gap: spacing.md }}>
-              <TouchableOpacity onPress={() => router.push('/bienvenida')}>
+              <TouchableOpacity onPress={() => router.replace('/bienvenida')}>
                 <Ionicons name="home-outline" size={24} color={colors.white} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/configuracion')}>
-                <Ionicons name="settings-outline" size={24} color={colors.white} />
               </TouchableOpacity>
             </View>
           ),

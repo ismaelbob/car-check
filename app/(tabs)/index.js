@@ -1,10 +1,9 @@
 import { useEffect, useMemo } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../../src/context/VehiculoContext';
 import VehicleCard from '../../src/components/VehicleCard';
-import { colors, typography, spacing } from '../../src/theme';
+import { colors } from '../../src/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -17,6 +16,12 @@ export default function HomeScreen() {
   } = useVehiculos();
 
   const vehiculo = vehiculos[vehiculoActivo];
+
+  useEffect(() => {
+    if (vehiculos.length === 0) {
+      router.replace('/bienvenida');
+    }
+  }, [vehiculos.length]);
 
   useEffect(() => {
     if (vehiculo) {
@@ -32,23 +37,8 @@ export default function HomeScreen() {
     return Math.max(...kms).toLocaleString();
   }, [vehiculo?.kilometrajeInicial, mantenimientos, cargasCombustible]);
 
-  if (vehiculos.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Ionicons name="car-sport-outline" size={80} color={colors.textLight} />
-        <Text style={styles.emptyTitle}>Aún no tienes vehículos</Text>
-        <Text style={styles.emptySubtitle}>
-          Registra tu primer vehículo para comenzar
-        </Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push('/registro')}
-        >
-          <Ionicons name="add-circle-outline" size={22} color={colors.white} />
-          <Text style={styles.addButtonText}>Agregar nuevo</Text>
-        </TouchableOpacity>
-      </View>
-    );
+  if (!vehiculo) {
+    return <View style={styles.container} />;
   }
 
   return (
@@ -65,38 +55,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-  },
-  emptyContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
-    gap: spacing.sm,
-  },
-  emptyTitle: {
-    ...typography.h2,
-    color: colors.primary,
-    marginTop: spacing.md,
-  },
-  emptySubtitle: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  addButton: {
-    backgroundColor: colors.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: spacing.xl,
-  },
-  addButtonText: {
-    ...typography.button,
-    color: colors.white,
   },
 });
