@@ -47,11 +47,13 @@ export async function obtenerTiposMantenimiento() {
 }
 
 export async function agregarTipoMantenimiento(nombre) {
+  if (!nombre) return;
   const database = await getDatabase();
   await database.runAsync('INSERT INTO tipos_mantenimiento (nombre) VALUES (?)', [nombre]);
 }
 
 export async function eliminarTipoMantenimiento(id) {
+  if (id == null) return;
   const database = await getDatabase();
   await database.runAsync('DELETE FROM tipos_mantenimiento WHERE id = ?', [id]);
 }
@@ -64,6 +66,7 @@ export async function obtenerCombustibles() {
 }
 
 export async function agregarCombustible(nombre, precio, unidad) {
+  if (!nombre) return;
   const database = await getDatabase();
   await database.runAsync(
     'INSERT INTO combustibles (nombre, precio, unidad) VALUES (?, ?, ?)',
@@ -72,6 +75,7 @@ export async function agregarCombustible(nombre, precio, unidad) {
 }
 
 export async function actualizarCombustible(id, nombre, precio, unidad) {
+  if (id == null) return;
   const database = await getDatabase();
   await database.runAsync(
     'UPDATE combustibles SET nombre = ?, precio = ?, unidad = ? WHERE id = ?',
@@ -80,6 +84,7 @@ export async function actualizarCombustible(id, nombre, precio, unidad) {
 }
 
 export async function eliminarCombustible(id) {
+  if (id == null) return;
   const database = await getDatabase();
   await database.runAsync('DELETE FROM combustibles WHERE id = ?', [id]);
 }
@@ -103,6 +108,7 @@ export async function limpiarDatosConfig() {
 // ---- Configuración simple ----
 
 export async function obtenerConfig(clave) {
+  if (!clave) return null;
   const database = await getDatabase();
   const row = await database.getFirstAsync(
     'SELECT valor FROM configuracion WHERE clave = ?',
@@ -112,6 +118,7 @@ export async function obtenerConfig(clave) {
 }
 
 export async function guardarConfig(clave, valor) {
+  if (!clave) return;
   const database = await getDatabase();
   await database.runAsync(
     'INSERT OR REPLACE INTO configuracion (clave, valor) VALUES (?, ?)',

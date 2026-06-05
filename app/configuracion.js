@@ -31,7 +31,7 @@ export default function ConfiguracionScreen() {
     actualizarMoneda,
   } = useConfig();
 
-  const { recargarVehiculos } = useVehiculos();
+  const { recargarVehiculos, setVehiculoActivo } = useVehiculos();
   const { recargarConfig } = useConfig();
 
   const [nuevoTipo, setNuevoTipo] = useState('');
@@ -157,6 +157,7 @@ export default function ConfiguracionScreen() {
                 return;
               }
               await Promise.all([recargarVehiculos(), recargarConfig()]);
+              setVehiculoActivo(0);
               Alert.alert('Importación exitosa', 'Los datos fueron importados correctamente');
             } catch (e) {
               Alert.alert('Error', e.message || 'No se pudo importar los datos');

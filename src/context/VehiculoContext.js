@@ -53,6 +53,7 @@ export function VehiculoProvider({ children }) {
   // ---- Historial ----
 
   const cargarHistorial = useCallback(async (vehiculoId) => {
+    if (vehiculoId == null) return;
     try {
       const [mants, cargas] = await Promise.all([
         db.obtenerMantenimientos(vehiculoId),

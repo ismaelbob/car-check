@@ -1,9 +1,12 @@
 import * as SQLite from 'expo-sqlite';
 
 let db = null;
+let dbPromise = null;
 
 async function getDb() {
-  if (!db) {
+  if (db) return db;
+  if (dbPromise) return dbPromise;
+  dbPromise = (async () => {
     db = await SQLite.openDatabaseAsync('car-check.db');
     await db.execAsync(`
       CREATE TABLE IF NOT EXISTS vehiculos (
@@ -64,8 +67,11 @@ async function getDb() {
     } catch (e) {
       // Column already exists — ok
     }
-  }
-  return db;
+    // Clean up any rows with null id from previous corrupt state
+    await db.runAsync('DELETE FROM vehiculos WHERE id IS NULL');
+    return db;
+  })();
+  return dbPromise;
 }
 
 export { getDb };
@@ -76,17 +82,19 @@ export async function obtenerVehiculos() {
 }
 
 export async function obtenerVehiculoPorId(id) {
+  if (id == null) return null;
   const database = await getDb();
   return await database.getFirstAsync('SELECT * FROM vehiculos WHERE id = ?', [id]);
 }
 
 export async function insertarVehiculo(vehiculo) {
+  const id = vehiculo.id || Date.now().toString();
   const database = await getDb();
   await database.runAsync(
     `INSERT INTO vehiculos (id, marca, modelo, tipo, año, color, placa, kilometrajeInicial, foto, combustible)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      vehiculo.id,
+      id,
       vehiculo.marca,
       vehiculo.modelo,
       vehiculo.tipo,
@@ -101,6 +109,7 @@ export async function insertarVehiculo(vehiculo) {
 }
 
 export async function actualizarVehiculo(id, data) {
+  if (id == null) return;
   const database = await getDb();
   await database.runAsync(
     `UPDATE vehiculos
@@ -122,6 +131,7 @@ export async function actualizarVehiculo(id, data) {
 }
 
 export async function eliminarVehiculo(id) {
+  if (id == null) return;
   const database = await getDb();
   await database.runAsync('DELETE FROM vehiculos WHERE id = ?', [id]);
 }
@@ -129,15 +139,18 @@ export async function eliminarVehiculo(id) {
 // ---- Mantenimientos ----
 
 export async function insertarMantenimiento(data) {
+  if (data.vehiculo_id == null) return;
+  const id = data.id || Date.now().toString();
   const database = await getDb();
   await database.runAsync(
     `INSERT INTO mantenimientos (id, vehiculo_id, tipo, descripcion, kilometraje, fecha, costo, taller)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [data.id, data.vehiculo_id, data.tipo, data.descripcion || null, data.kilometraje, data.fecha, data.costo || null, data.taller || null]
+    [id, data.vehiculo_id, data.tipo, data.descripcion || null, data.kilometraje, data.fecha, data.costo || null, data.taller || null]
   );
 }
 
 export async function obtenerMantenimientos(vehiculoId) {
+  if (vehiculoId == null) return [];
   const database = await getDb();
   return await database.getAllAsync(
     'SELECT * FROM mantenimientos WHERE vehiculo_id = ? ORDER BY fecha DESC',
@@ -146,6 +159,7 @@ export async function obtenerMantenimientos(vehiculoId) {
 }
 
 export async function eliminarMantenimiento(id) {
+  if (id == null) return;
   const database = await getDb();
   await database.runAsync('DELETE FROM mantenimientos WHERE id = ?', [id]);
 }
@@ -153,15 +167,18 @@ export async function eliminarMantenimiento(id) {
 // ---- Cargas de combustible ----
 
 export async function insertarCargaCombustible(data) {
+  if (data.vehiculo_id == null) return;
+  const id = data.id || Date.now().toString();
   const database = await getDb();
   await database.runAsync(
     `INSERT INTO cargas_combustible (id, vehiculo_id, litros, costo, kilometraje, tipo_combustible, fecha)
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [data.id, data.vehiculo_id, data.litros, data.costo, data.kilometraje, data.tipo_combustible || null, data.fecha]
+    [id, data.vehiculo_id, data.litros, data.costo, data.kilometraje, data.tipo_combustible || null, data.fecha]
   );
 }
 
 export async function obtenerCargasCombustible(vehiculoId) {
+  if (vehiculoId == null) return [];
   const database = await getDb();
   return await database.getAllAsync(
     'SELECT * FROM cargas_combustible WHERE vehiculo_id = ? ORDER BY fecha DESC',
@@ -170,6 +187,7 @@ export async function obtenerCargasCombustible(vehiculoId) {
 }
 
 export async function eliminarCargaCombustible(id) {
+  if (id == null) return;
   const database = await getDb();
   await database.runAsync('DELETE FROM cargas_combustible WHERE id = ?', [id]);
 }

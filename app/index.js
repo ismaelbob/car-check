@@ -44,6 +44,7 @@ export default function WelcomeScreen() {
                 return;
               }
               await Promise.all([recargarVehiculos(), recargarConfig()]);
+              setVehiculoActivo(0);
               Alert.alert('Importación exitosa', 'Los datos fueron importados correctamente');
             } catch (e) {
               Alert.alert('Error', e.message || 'No se pudo importar los datos');

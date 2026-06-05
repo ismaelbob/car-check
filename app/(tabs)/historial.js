@@ -34,7 +34,7 @@ export default function HistorialScreen() {
   const vehiculo = vehiculos[vehiculoActivo];
 
   useEffect(() => {
-    if (vehiculo) {
+    if (vehiculo?.id) {
       cargarHistorial(vehiculo.id);
     }
   }, [vehiculo?.id]);

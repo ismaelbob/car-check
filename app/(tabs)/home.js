@@ -18,7 +18,7 @@ export default function HomeScreen() {
   const vehiculo = vehiculos[vehiculoActivo];
 
   useEffect(() => {
-    if (vehiculo) {
+    if (vehiculo?.id) {
       cargarHistorial(vehiculo.id);
     }
   }, [vehiculo?.id]);
