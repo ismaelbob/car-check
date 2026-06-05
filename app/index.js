@@ -15,7 +15,7 @@ export default function WelcomeScreen() {
 
   const handleSelectVehicle = (index) => {
     setVehiculoActivo(index);
-    router.replace('/(tabs)/');
+    router.replace('/home');
   };
 
   const handleSettings = () => {

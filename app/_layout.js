@@ -10,7 +10,7 @@ export default function RootLayout() {
       <ConfigProvider>
         <StatusBar style="light" />
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="bienvenida" />
+          <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen
             name="registro"

@@ -18,12 +18,6 @@ export default function HomeScreen() {
   const vehiculo = vehiculos[vehiculoActivo];
 
   useEffect(() => {
-    if (vehiculos.length === 0) {
-      router.replace('/bienvenida');
-    }
-  }, [vehiculos.length]);
-
-  useEffect(() => {
     if (vehiculo) {
       cargarHistorial(vehiculo.id);
     }

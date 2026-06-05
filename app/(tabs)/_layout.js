@@ -12,11 +12,11 @@ export default function TabLayout() {
   useEffect(() => {
     const onBackPress = () => {
       if (pathname === '/historial' || pathname === '/proximos-cambios') {
-        router.navigate('/');
+        router.navigate('/home');
         return true;
       }
-      if (pathname === '/') {
-        router.replace('/bienvenida');
+      if (pathname === '/home') {
+        router.replace('/');
         return true;
       }
       return false;
@@ -28,7 +28,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="index"
+      initialRouteName="home"
       screenOptions={{
         headerStyle: { backgroundColor: colors.primary },
         headerTintColor: colors.white,
@@ -59,7 +59,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: 'Inicio',
           headerTitle: 'Inicio',
@@ -68,7 +68,7 @@ export default function TabLayout() {
           ),
           headerRight: () => (
             <View style={{ flexDirection: 'row', marginRight: 16, gap: spacing.md }}>
-              <TouchableOpacity onPress={() => router.replace('/bienvenida')}>
+              <TouchableOpacity onPress={() => router.replace('/')}>
                 <Ionicons name="home-outline" size={24} color={colors.white} />
               </TouchableOpacity>
             </View>
