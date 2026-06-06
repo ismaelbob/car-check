@@ -62,11 +62,10 @@ export default function WelcomeScreen() {
       <View style={styles.wrapper}>
         <View style={styles.emptyContainer}>
           <View style={styles.emptyBrand}>
-            <Ionicons name="car-sport-outline" size={80} color={colors.primary} />
+            <Image source={require('../assets/icon_outline.png')} style={styles.emptyBrandIcon} />
             <Text style={styles.appTitle}>Car Check</Text>
           </View>
           <View style={styles.emptyBody}>
-            <Ionicons name="car-outline" size={64} color={colors.textLight} />
             <Text style={styles.emptyTitle}>Bienvenido</Text>
             <Text style={styles.emptySubtitle}>
               Registra tu primer vehículo para comenzar
@@ -101,9 +100,7 @@ export default function WelcomeScreen() {
     <View style={styles.wrapper}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerIcon}>
-            <Ionicons name="car-sport-outline" size={36} color={colors.white} />
-          </Text>
+          <Image source={require('../assets/icon_outline.png')} style={styles.headerIcon} />
           <Text style={styles.headerTitle}>Car Check</Text>
           <Text style={styles.headerSubtitle}>Selecciona un vehículo para ingresar</Text>
         </View>
@@ -174,7 +171,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerIcon: {
-    marginBottom: spacing.sm,
+    width: 80,
+    height: 80,
+    resizeMode: 'contain',
+    marginBottom: -10,
+  },
+  emptyBrandIcon: {
+    width: 80,
+    height: 80,
+    resizeMode: 'contain',
   },
   headerTitle: {
     ...typography.h1,
@@ -239,7 +244,7 @@ const styles = StyleSheet.create({
   appTitle: {
     ...typography.h1,
     color: colors.white,
-    marginTop: spacing.md,
+    marginTop: -10,
   },
   emptyBody: {
     flex: 1,
