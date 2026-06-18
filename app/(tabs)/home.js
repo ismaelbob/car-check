@@ -29,12 +29,14 @@ export default function HomeScreen() {
     }
   }, [vehiculo?.id]);
 
-  const ultimoKilometraje = useMemo(() => {
-    if (!vehiculo) return '';
-    const kms = [parseFloat(vehiculo.kilometrajeInicial) || 0];
+  const kmData = useMemo(() => {
+    if (!vehiculo) return { ultimo: 0, recorridos: 0 };
+    const inicial = parseFloat(vehiculo.kilometrajeInicial) || 0;
+    const kms = [inicial];
     mantenimientos.forEach((m) => kms.push(parseFloat(m.kilometraje) || 0));
     cargasCombustible.forEach((c) => kms.push(parseFloat(c.kilometraje) || 0));
-    return Math.max(...kms).toLocaleString();
+    const ultimo = Math.max(...kms);
+    return { ultimo, recorridos: ultimo - inicial };
   }, [vehiculo?.kilometrajeInicial, mantenimientos, cargasCombustible]);
 
   if (!vehiculo) {
@@ -45,7 +47,8 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <VehicleCard
         vehiculo={vehiculo}
-        ultimoKilometraje={ultimoKilometraje}
+        ultimoKilometraje={kmData.ultimo}
+        kilometrosRecorridos={kmData.recorridos}
       />
     </View>
   );

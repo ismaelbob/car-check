@@ -6,7 +6,7 @@ import { useVehiculos } from '../context/VehiculoContext';
 import DeleteVehicleModal from './DeleteVehicleModal';
 import { colors, typography, spacing } from '../theme';
 
-export default function VehicleCard({ vehiculo, ultimoKilometraje }) {
+export default function VehicleCard({ vehiculo, ultimoKilometraje, kilometrosRecorridos }) {
   const router = useRouter();
   const { eliminarVehiculo } = useVehiculos();
   const [menuVisible, setMenuVisible] = useState(false);
@@ -66,8 +66,18 @@ export default function VehicleCard({ vehiculo, ultimoKilometraje }) {
         </View>
         <View style={styles.divider} />
         <View style={styles.row}>
+          <Text style={styles.label}>Kilometraje inicial</Text>
+          <Text style={styles.value}>{parseFloat(vehiculo.kilometrajeInicial).toLocaleString()} km</Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.row}>
           <Text style={styles.label}>Último kilometraje</Text>
-          <Text style={styles.value}>{ultimoKilometraje || vehiculo.kilometrajeInicial} km</Text>
+          <Text style={styles.value}>{ultimoKilometraje.toLocaleString()} km</Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.row}>
+          <Text style={[styles.label, styles.highlightedLabel]}>Kilómetros recorridos</Text>
+          <Text style={[styles.value, styles.highlightedValue]}>+{kilometrosRecorridos.toLocaleString()} km</Text>
         </View>
       </View>
 
@@ -179,6 +189,14 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: colors.border,
+  },
+  highlightedLabel: {
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  highlightedValue: {
+    color: colors.secondary,
+    fontWeight: '700',
   },
   overlay: {
     flex: 1,

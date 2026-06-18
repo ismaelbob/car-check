@@ -8,6 +8,7 @@ export function VehiculoProvider({ children }) {
   const [vehiculoActivo, setVehiculoActivo] = useState(0);
   const [mantenimientos, setMantenimientos] = useState([]);
   const [cargasCombustible, setCargasCombustible] = useState([]);
+  const [isReady, setIsReady] = useState(false);
 
   const cargarVehiculos = useCallback(async () => {
     try {
@@ -19,7 +20,7 @@ export function VehiculoProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    cargarVehiculos();
+    cargarVehiculos().finally(() => setIsReady(true));
   }, [cargarVehiculos]);
 
   const agregarVehiculo = useCallback(async (data) => {
@@ -91,6 +92,7 @@ export function VehiculoProvider({ children }) {
   return (
     <VehiculoContext.Provider
       value={{
+        isReady,
         vehiculos,
         vehiculoActivo,
         setVehiculoActivo: cambiarVehiculoActivo,
