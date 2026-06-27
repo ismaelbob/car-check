@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -28,7 +28,7 @@ const formatDate = (d) => {
 
 export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimoKilometraje }) {
   const { agregarMantenimiento } = useVehiculos();
-  const { tiposMantenimiento, moneda } = useConfig();
+  const { tiposMantenimiento, moneda, agregarTipoMantenimiento } = useConfig();
   const [tipo, setTipo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [kilometraje, setKilometraje] = useState('');
@@ -38,6 +38,31 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
   const [costo, setCosto] = useState('');
   const [taller, setTaller] = useState('');
   const [tipoPickerVisible, setTipoPickerVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [showNewTipoInput, setShowNewTipoInput] = useState(false);
+  const [newTipoName, setNewTipoName] = useState('');
+
+  const tiposFiltrados = useMemo(() => {
+    if (!searchText.trim()) return tiposMantenimiento.map((t) => t.nombre);
+    const q = searchText.trim().toLowerCase();
+    return tiposMantenimiento
+      .map((t) => t.nombre)
+      .filter((nombre) => nombre.toLowerCase().includes(q));
+  }, [tiposMantenimiento, searchText]);
+
+  const openTipoPicker = () => {
+    setSearchText('');
+    setShowNewTipoInput(false);
+    setNewTipoName('');
+    setTipoPickerVisible(true);
+  };
+
+  const closeTipoPicker = () => {
+    setSearchText('');
+    setShowNewTipoInput(false);
+    setNewTipoName('');
+    setTipoPickerVisible(false);
+  };
 
   useEffect(() => {
     if (visible && ultimoKilometraje) {
@@ -102,7 +127,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                 <Text style={styles.label}>Tipo *</Text>
                 <TouchableOpacity
                   style={[styles.input, styles.select]}
-                  onPress={() => setTipoPickerVisible(true)}
+                  onPress={openTipoPicker}
                 >
                   <Text style={[!tipo && { color: colors.textLight }]}>
                     {tipo || 'Seleccionar tipo'}
@@ -196,43 +221,113 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
               </TouchableOpacity>
             </ScrollView>
 
-            <Modal visible={tipoPickerVisible} transparent animationType="fade" onRequestClose={() => setTipoPickerVisible(false)}>
-              <Pressable
-                style={styles.pickerOverlay}
-                onPress={() => setTipoPickerVisible(false)}
+            <Modal visible={tipoPickerVisible} transparent animationType="fade" onRequestClose={closeTipoPicker}>
+              <KeyboardAvoidingView
+                style={styles.flex}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               >
-                <Pressable style={styles.pickerSheet}>
-                  <Text style={styles.pickerTitle}>Seleccionar tipo</Text>
-                  <FlatList
-                    data={tiposMantenimiento.map((t) => t.nombre)}
-                    keyExtractor={(item) => item}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity
-                        style={[
-                          styles.pickerOption,
-                          item === tipo && styles.pickerOptionActive,
-                        ]}
-                        onPress={() => {
-                          setTipo(item);
-                          setTipoPickerVisible(false);
-                        }}
-                      >
-                        <Text
-                          style={[
-                            styles.pickerOptionText,
-                            item === tipo && styles.pickerOptionTextActive,
-                          ]}
-                        >
-                          {item}
-                        </Text>
-                        {item === tipo && (
-                          <Ionicons name="checkmark" size={20} color={colors.primary} />
+                <Pressable style={styles.pickerOverlay} onPress={closeTipoPicker}>
+                  <Pressable style={styles.pickerSheet} onPress={() => {}}>
+                    <Text style={styles.pickerTitle}>Seleccionar tipo</Text>
+
+                    <View style={styles.searchContainer}>
+                      <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchIcon} />
+                      <TextInput
+                        style={styles.searchInput}
+                        placeholder="Buscar tipo..."
+                        placeholderTextColor={colors.textLight}
+                        value={searchText}
+                        onChangeText={setSearchText}
+                      />
+                      {searchText.length > 0 && (
+                        <TouchableOpacity onPress={() => setSearchText('')}>
+                          <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+
+                    {showNewTipoInput ? (
+                      <View style={styles.newTipoSection}>
+                        <TextInput
+                          style={styles.newTipoInput}
+                          placeholder="Nombre del nuevo tipo"
+                          placeholderTextColor={colors.textLight}
+                          value={newTipoName}
+                          onChangeText={setNewTipoName}
+                          autoFocus
+                        />
+                        <View style={styles.newTipoActions}>
+                          <TouchableOpacity
+                            style={styles.newTipoCancel}
+                            onPress={() => {
+                              setShowNewTipoInput(false);
+                              setNewTipoName('');
+                            }}
+                          >
+                            <Text style={styles.newTipoCancelText}>Cancelar</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.newTipoSave}
+                            onPress={async () => {
+                              const name = newTipoName.trim();
+                              if (!name) return;
+                              try {
+                                await agregarTipoMantenimiento(name);
+                                setTipo(name);
+                                closeTipoPicker();
+                              } catch (e) {
+                                Alert.alert('Error', 'El tipo de mantenimiento ya existe o no se pudo guardar');
+                              }
+                            }}
+                          >
+                            <Ionicons name="checkmark" size={18} color={colors.white} />
+                            <Text style={styles.newTipoSaveText}>Guardar</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    ) : (
+                      <FlatList
+                        data={tiposFiltrados}
+                        keyboardShouldPersistTaps="handled"
+                        keyExtractor={(item) => item}
+                        renderItem={({ item }) => (
+                          <TouchableOpacity
+                            style={[
+                              styles.pickerOption,
+                              item === tipo && styles.pickerOptionActive,
+                            ]}
+                            onPress={() => {
+                              setTipo(item);
+                              closeTipoPicker();
+                            }}
+                          >
+                            <Text
+                              style={[
+                                styles.pickerOptionText,
+                                item === tipo && styles.pickerOptionTextActive,
+                              ]}
+                            >
+                              {item}
+                            </Text>
+                            {item === tipo && (
+                              <Ionicons name="checkmark" size={20} color={colors.primary} />
+                            )}
+                          </TouchableOpacity>
                         )}
-                      </TouchableOpacity>
+                        ListFooterComponent={() => (
+                          <TouchableOpacity
+                            style={styles.addTipoButton}
+                            onPress={() => setShowNewTipoInput(true)}
+                          >
+                            <Ionicons name="add-circle-outline" size={20} color={colors.secondary} />
+                            <Text style={styles.addTipoButtonText}>Agregar nuevo tipo</Text>
+                          </TouchableOpacity>
+                        )}
+                      />
                     )}
-                  />
+                  </Pressable>
                 </Pressable>
-              </Pressable>
+              </KeyboardAvoidingView>
             </Modal>
           </Pressable>
         </Pressable>
@@ -363,6 +458,86 @@ const styles = StyleSheet.create({
   },
   pickerOptionTextActive: {
     color: colors.primary,
+    fontWeight: '600',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: 10,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+    height: 44,
+    gap: spacing.sm,
+  },
+  searchIcon: {
+    marginRight: 0,
+  },
+  searchInput: {
+    flex: 1,
+    ...typography.body,
+    color: colors.textPrimary,
+    paddingVertical: 0,
+  },
+  newTipoSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    gap: spacing.md,
+  },
+  newTipoInput: {
+    ...typography.body,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+    color: colors.textPrimary,
+  },
+  newTipoActions: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    justifyContent: 'flex-end',
+  },
+  newTipoCancel: {
+    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  newTipoCancelText: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  newTipoSave: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.primary,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    borderRadius: 10,
+  },
+  newTipoSaveText: {
+    ...typography.button,
+    color: colors.white,
+  },
+  addTipoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+    paddingVertical: 14,
+    marginTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    marginHorizontal: spacing.lg,
+  },
+  addTipoButtonText: {
+    ...typography.body,
+    color: colors.secondary,
     fontWeight: '600',
   },
 });

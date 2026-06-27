@@ -41,6 +41,15 @@ function AppContent() {
             presentation: 'card',
           }}
         />
+        <Stack.Screen
+          name="acerca-de"
+          options={{
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.primary },
+            headerTintColor: colors.white,
+            presentation: 'card',
+          }}
+        />
       </Stack>
     </>
   );

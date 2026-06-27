@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Linking, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, FlatList, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../src/context/VehiculoContext';
@@ -86,16 +86,17 @@ export default function WelcomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        <TouchableOpacity
-          style={styles.footer}
-          onPress={() => Linking.openURL('mailto:bobismaeljg@gmail.com')}
-        >
-          <Text style={styles.footerText}>Development by IsmaelBob</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.footer}
+        onPress={() => router.push('/acerca-de')}
+      >
+        <Text style={styles.footerText}>Development by IsmaelBob</Text>
+        <Ionicons name="chevron-forward-outline" size={14} color={colors.secondary} />
+      </TouchableOpacity>
+    </View>
     );
   }
-
+  
   return (
     <View style={styles.wrapper}>
       <View style={styles.container}>
@@ -146,9 +147,10 @@ export default function WelcomeScreen() {
       </View>
       <TouchableOpacity
         style={styles.footer}
-        onPress={() => Linking.openURL('mailto:bobismaeljg@gmail.com')}
+        onPress={() => router.push('/acerca-de')}
       >
         <Text style={styles.footerText}>Development by IsmaelBob</Text>
+        <Ionicons name="chevron-forward-outline" size={14} color={colors.secondary} />
       </TouchableOpacity>
     </View>
   );
@@ -321,14 +323,16 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   footer: {
-    paddingVertical: spacing.md,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.lg,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   footerText: {
     ...typography.caption,
-    color: colors.textLight,
+    color: colors.secondary,
   },
 });
