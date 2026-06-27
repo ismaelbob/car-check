@@ -12,6 +12,7 @@ import {
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
+import Constants from 'expo-constants';
 import { colors, typography, spacing } from '../src/theme';
 
 const CUENTA_DONACION = '3500480997';
@@ -41,7 +42,7 @@ export default function AcercaDeScreen() {
           />
         </View>
         <Text style={styles.appName}>Car Check</Text>
-        <Text style={styles.version}>Versión 1.0.0</Text>
+        <Text style={styles.version}>Versión {Constants.expoConfig?.version || '1.0.0'}</Text>
       </View>
 
       <Text style={styles.description}>
