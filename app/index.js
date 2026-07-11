@@ -149,8 +149,8 @@ export default function WelcomeScreen() {
         style={styles.footer}
         onPress={() => router.push('/acerca-de')}
       >
-        <Text style={styles.footerText}>Development by IsmaelBob</Text>
-        <Ionicons name="chevron-forward-outline" size={14} color={colors.secondary} />
+        <Text style={styles.footerText}>Acerca de</Text>
+        <Ionicons name="chevron-forward-outline" size={15} color={colors.secondary} />
       </TouchableOpacity>
     </View>
   );
@@ -327,12 +327,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
-    paddingVertical: spacing.lg,
+    paddingVertical: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
   footerText: {
     ...typography.caption,
     color: colors.secondary,
+    fontWeight: 'bold',
   },
 });

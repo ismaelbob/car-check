@@ -83,7 +83,7 @@ export default function AcercaDeScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="person-outline" size={20} color={colors.primary} />
-          <Text style={styles.sectionTitle}>Desarrollador</Text>
+          <Text style={styles.sectionTitle}>Desarrollado por: Ismael Jancko</Text>
         </View>
         <TouchableOpacity
           style={styles.contactRow}
