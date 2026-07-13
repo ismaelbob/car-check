@@ -2,14 +2,16 @@ import { StyleSheet, Text, View, TouchableOpacity, Modal, Pressable } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { typography, spacing } from '../theme';
 import { useTheme } from '../context/ThemeContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AddRecordSheet({ visible, onClose, onSelectMantenimiento, onSelectCarga }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <Modal visible={visible} transparent animationType="fade">
       <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]}>
+        <Pressable style={[styles.sheet, { backgroundColor: colors.surface, paddingBottom: spacing.xxl + insets.bottom }]}>
           <Text style={[styles.title, { color: colors.textPrimary }]}>Agregar registro</Text>
 
           <TouchableOpacity
@@ -22,10 +24,10 @@ export default function AddRecordSheet({ visible, onClose, onSelectMantenimiento
             <View style={[styles.iconCircle, { backgroundColor: colors.secondary + '20' }]}>
               <Ionicons name="settings-outline" size={24} color={colors.secondary} />
             </View>
-            <TouchableOpacity style={styles.optionInfo}>
+            <View style={styles.optionInfo}>
               <Text style={[styles.optionTitle, { color: colors.textPrimary }]}>Mantenimiento</Text>
               <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>Aceite, frenos, llantas, etc.</Text>
-            </TouchableOpacity>
+            </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
           </TouchableOpacity>
 
@@ -41,10 +43,10 @@ export default function AddRecordSheet({ visible, onClose, onSelectMantenimiento
             <View style={[styles.iconCircle, { backgroundColor: colors.warning + '20' }]}>
               <Ionicons name="flame-outline" size={24} color={colors.warning} />
             </View>
-            <TouchableOpacity style={styles.optionInfo}>
+            <View style={styles.optionInfo}>
               <Text style={[styles.optionTitle, { color: colors.textPrimary }]}>Carga de combustible</Text>
               <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>Registra litros, costo y kilometraje</Text>
-            </TouchableOpacity>
+            </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
           </TouchableOpacity>
 
