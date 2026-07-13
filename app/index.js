@@ -5,12 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../src/context/VehiculoContext';
 import { useConfig } from '../src/context/ConfigContext';
 import { importarDatos } from '../src/export-import';
-import { colors, typography, spacing } from '../src/theme';
+import { typography, spacing } from '../src/theme';
+import { useTheme } from '../src/context/ThemeContext';
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { vehiculos, setVehiculoActivo, recargarVehiculos } = useVehiculos();
   const { recargarConfig } = useConfig();
+  const { colors } = useTheme();
   const [importing, setImporting] = useState(false);
 
   const handleSelectVehicle = (index) => {
@@ -59,38 +61,38 @@ export default function WelcomeScreen() {
 
   if (vehiculos.length === 0) {
     return (
-      <View style={styles.wrapper}>
-        <View style={styles.emptyContainer}>
+      <View style={[styles.wrapper, { backgroundColor: colors.background }]}>
+        <View style={[styles.emptyContainer, { backgroundColor: colors.primary }]}>
           <View style={styles.emptyBrand}>
             <Image source={require('../assets/icon_outline.png')} style={styles.emptyBrandIcon} />
-            <Text style={styles.appTitle}>Car Check</Text>
+            <Text style={[styles.appTitle, { color: colors.white }]}>Car Check</Text>
           </View>
-          <View style={styles.emptyBody}>
-            <Text style={styles.emptyTitle}>Bienvenido</Text>
-            <Text style={styles.emptySubtitle}>
+          <View style={[styles.emptyBody, { backgroundColor: colors.background }]}>
+            <Text style={[styles.emptyTitle, { color: colors.primary }]}>Bienvenido</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
               Registra tu primer vehículo para comenzar
             </Text>
-            <TouchableOpacity style={styles.button} onPress={handleAddVehicle}>
+            <TouchableOpacity style={[styles.button, { backgroundColor: colors.secondary }]} onPress={handleAddVehicle}>
               <Ionicons name="add-circle-outline" size={22} color={colors.white} />
-              <Text style={styles.buttonText}>Agregar vehículo</Text>
+              <Text style={[styles.buttonText, { color: colors.white }]}>Agregar vehículo</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.button, styles.importBtn, importing && styles.importBtnDisabled]}
+              style={[styles.button, styles.importBtn, { backgroundColor: colors.primary }, importing && styles.importBtnDisabled]}
               onPress={handleImportar}
               disabled={importing}
             >
               <Ionicons name="cloud-download-outline" size={22} color={colors.white} />
-              <Text style={styles.buttonText}>
+              <Text style={[styles.buttonText, { color: colors.white }]}>
                 {importing ? 'Importando…' : 'Importar datos'}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
       <TouchableOpacity
-        style={styles.footer}
+        style={[styles.footer, { borderTopColor: colors.border }]}
         onPress={() => router.push('/acerca-de')}
       >
-        <Text style={styles.footerText}>Development by IsmaelBob</Text>
+        <Text style={[styles.footerText, { color: colors.secondary }]}>Development by IsmaelBob</Text>
         <Ionicons name="chevron-forward-outline" size={14} color={colors.secondary} />
       </TouchableOpacity>
     </View>
@@ -98,23 +100,23 @@ export default function WelcomeScreen() {
   }
   
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.container}>
-        <View style={styles.header}>
+    <View style={[styles.wrapper, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { backgroundColor: colors.primary }]}>
           <Image source={require('../assets/icon_outline.png')} style={styles.headerIcon} />
-          <Text style={styles.headerTitle}>Car Check</Text>
-          <Text style={styles.headerSubtitle}>Selecciona un vehículo para ingresar</Text>
+          <Text style={[styles.headerTitle, { color: colors.white }]}>Car Check</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.white }]}>Selecciona un vehículo para ingresar</Text>
         </View>
         <FlatList
           data={vehiculos}
           keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (
             <TouchableOpacity
-              style={styles.vehicleCard}
+              style={[styles.vehicleCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
               onPress={() => handleSelectVehicle(index)}
               activeOpacity={0.7}
             >
-              <View style={styles.vehiclePhoto}>
+              <View style={[styles.vehiclePhoto, { backgroundColor: colors.background }]}>
                 {item.foto ? (
                   <Image source={{ uri: item.foto }} style={styles.vehicleImage} />
                 ) : (
@@ -122,10 +124,10 @@ export default function WelcomeScreen() {
                 )}
               </View>
               <View style={styles.vehicleInfo}>
-                <Text style={styles.vehicleName}>
+                <Text style={[styles.vehicleName, { color: colors.textPrimary }]}>
                   {item.marca} {item.modelo}
                 </Text>
-                <Text style={styles.vehicleDetail}>
+                <Text style={[styles.vehicleDetail, { color: colors.textSecondary }]}>
                   {item.placa} · {item.año}
                 </Text>
               </View>
@@ -137,19 +139,19 @@ export default function WelcomeScreen() {
         />
 
         <View style={styles.fabContainer}>
-          <TouchableOpacity style={styles.fabSecondary} onPress={handleSettings}>
+          <TouchableOpacity style={[styles.fabSecondary, { backgroundColor: colors.primary }]} onPress={handleSettings}>
             <Ionicons name="settings-outline" size={24} color={colors.white} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.fab} onPress={handleAddVehicle}>
+          <TouchableOpacity style={[styles.fab, { backgroundColor: colors.secondary }]} onPress={handleAddVehicle}>
             <Ionicons name="add" size={28} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>
       <TouchableOpacity
-        style={styles.footer}
+        style={[styles.footer, { borderTopColor: colors.border }]}
         onPress={() => router.push('/acerca-de')}
       >
-        <Text style={styles.footerText}>Acerca de</Text>
+        <Text style={[styles.footerText, { color: colors.secondary }]}>Acerca de</Text>
         <Ionicons name="chevron-forward-outline" size={15} color={colors.secondary} />
       </TouchableOpacity>
     </View>
@@ -159,14 +161,11 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
-    backgroundColor: colors.primary,
     paddingTop: 60,
     paddingBottom: spacing.xl,
     paddingHorizontal: spacing.lg,
@@ -185,12 +184,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...typography.h1,
-    color: colors.white,
     marginBottom: spacing.xs,
   },
   headerSubtitle: {
     ...typography.body,
-    color: colors.white,
     opacity: 0.8,
   },
   list: {
@@ -200,18 +197,15 @@ const styles = StyleSheet.create({
   vehicleCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: spacing.md,
     gap: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   vehiclePhoto: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
@@ -227,16 +221,13 @@ const styles = StyleSheet.create({
   },
   vehicleName: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   vehicleDetail: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
   emptyContainer: {
     flex: 1,
-    backgroundColor: colors.primary,
   },
   emptyBrand: {
     alignItems: 'center',
@@ -245,12 +236,10 @@ const styles = StyleSheet.create({
   },
   appTitle: {
     ...typography.h1,
-    color: colors.white,
     marginTop: -10,
   },
   emptyBody: {
     flex: 1,
-    backgroundColor: colors.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     alignItems: 'center',
@@ -260,17 +249,14 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typography.h2,
-    color: colors.primary,
     marginTop: spacing.md,
   },
   emptySubtitle: {
     ...typography.body,
-    color: colors.textSecondary,
     textAlign: 'center',
     marginBottom: spacing.lg,
   },
   button: {
-    backgroundColor: colors.secondary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -280,14 +266,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
   },
   importBtn: {
-    backgroundColor: colors.primary,
   },
   importBtnDisabled: {
     opacity: 0.6,
   },
   buttonText: {
     ...typography.button,
-    color: colors.white,
   },
   fabContainer: {
     position: 'absolute',
@@ -300,7 +284,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -313,7 +296,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -329,11 +311,9 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingVertical: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   footerText: {
     ...typography.caption,
-    color: colors.secondary,
     fontWeight: 'bold',
   },
 });

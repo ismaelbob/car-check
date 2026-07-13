@@ -12,13 +12,21 @@ import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useConfig } from '../src/context/ConfigContext';
 import { useVehiculos } from '../src/context/VehiculoContext';
+import { useTheme } from '../src/context/ThemeContext';
 import { exportarDatos, importarDatos } from '../src/export-import';
-import { colors, typography, spacing } from '../src/theme';
+import { typography, spacing } from '../src/theme';
 
 const UNIDADES_OPCIONES = ['L', 'm3', 'kg', 'gal'];
 
+const TEMAS_OPCIONES = [
+  { value: 'light', label: 'Claro', icon: 'sunny-outline' },
+  { value: 'dark', label: 'Oscuro', icon: 'moon-outline' },
+  { value: 'system', label: 'Sistema', icon: 'phone-portrait-outline' },
+];
+
 export default function ConfiguracionScreen() {
   const navigation = useNavigation();
+  const { colors, themeMode, cambiarTema } = useTheme();
   const {
     tiposMantenimiento,
     combustibles,
@@ -172,7 +180,7 @@ export default function ConfiguracionScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.scrollContent}
       keyboardShouldPersistTaps="handled"
     >
@@ -180,15 +188,15 @@ export default function ConfiguracionScreen() {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="settings-outline" size={20} color={colors.primary} />
-          <Text style={styles.sectionTitle}>Tipos de mantenimiento</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Tipos de mantenimiento</Text>
         </View>
-        <Text style={styles.sectionDesc}>
+        <Text style={[styles.sectionDesc, { color: colors.textSecondary }]}>
           Estos tipos aparecerán en el formulario de mantenimiento.
         </Text>
         <View style={styles.chipsWrap}>
           {tiposMantenimiento.map((t) => (
-            <View key={t.id} style={styles.chip}>
-              <Text style={styles.chipText}>{t.nombre}</Text>
+            <View key={t.id} style={[styles.chip, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.chipText, { color: colors.textPrimary }]}>{t.nombre}</Text>
               <TouchableOpacity
                 onPress={() => handleEliminarTipo(t.id, t.nombre)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -200,35 +208,35 @@ export default function ConfiguracionScreen() {
         </View>
         <View style={styles.addRow}>
           <TextInput
-            style={[styles.input, styles.addInput]}
+            style={[styles.input, styles.addInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
             placeholder="Nuevo tipo"
             placeholderTextColor={colors.textLight}
             value={nuevoTipo}
             onChangeText={setNuevoTipo}
           />
-          <TouchableOpacity style={styles.addBtn} onPress={handleAgregarTipo}>
+          <TouchableOpacity style={[styles.addBtn, { backgroundColor: colors.secondary }]} onPress={handleAgregarTipo}>
             <Ionicons name="add" size={20} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* === Combustibles === */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="flame-outline" size={20} color={colors.primary} />
-          <Text style={styles.sectionTitle}>Combustibles</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Combustibles</Text>
         </View>
-        <Text style={styles.sectionDesc}>
+        <Text style={[styles.sectionDesc, { color: colors.textSecondary }]}>
           Gestiona los combustibles, precios y unidades para el formulario de carga.
         </Text>
 
         {combustibles.map((c) => (
-          <View key={c.id} style={styles.combItem}>
+          <View key={c.id} style={[styles.combItem, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.combInfo}>
-              <Text style={styles.combNombre}>{c.nombre}</Text>
-              <Text style={styles.combDetalle}>
+              <Text style={[styles.combNombre, { color: colors.textPrimary }]}>{c.nombre}</Text>
+              <Text style={[styles.combDetalle, { color: colors.textSecondary }]}>
                 {moneda} {c.precio.toFixed(2)} / {c.unidad}
               </Text>
             </View>
@@ -250,9 +258,9 @@ export default function ConfiguracionScreen() {
         ))}
 
         {showCombForm ? (
-          <View style={styles.combForm}>
+          <View style={[styles.combForm, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
               placeholder="Nombre"
               placeholderTextColor={colors.textLight}
               value={combNombre}
@@ -260,7 +268,7 @@ export default function ConfiguracionScreen() {
             />
             <View style={styles.combFormRow}>
               <TextInput
-                style={[styles.input, styles.combFormInput]}
+                style={[styles.input, styles.combFormInput, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                 placeholder="Precio"
                 placeholderTextColor={colors.textLight}
                 keyboardType="decimal-pad"
@@ -271,11 +279,11 @@ export default function ConfiguracionScreen() {
                 {UNIDADES_OPCIONES.map((u) => (
                   <TouchableOpacity
                     key={u}
-                    style={[styles.unidadOpt, combUnidad === u && styles.unidadOptActive]}
+                    style={[styles.unidadOpt, { borderColor: colors.border }, combUnidad === u && { borderColor: colors.secondary, backgroundColor: colors.secondary + '15' }]}
                     onPress={() => setCombUnidad(u)}
                   >
                     <Text
-                      style={[styles.unidadOptText, combUnidad === u && styles.unidadOptTextActive]}
+                      style={[styles.unidadOptText, { color: colors.textSecondary }, combUnidad === u && { color: colors.secondary, fontWeight: '600' }]}
                     >
                       {u}
                     </Text>
@@ -284,11 +292,11 @@ export default function ConfiguracionScreen() {
               </View>
             </View>
             <View style={styles.combFormActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={resetCombForm}>
-                <Text style={styles.cancelBtnText}>Cancelar</Text>
+              <TouchableOpacity style={[styles.cancelBtn, { borderColor: colors.border }]} onPress={resetCombForm}>
+                <Text style={[styles.cancelBtnText, { color: colors.textSecondary }]}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.saveBtn} onPress={handleGuardarCombustible}>
-                <Text style={styles.saveBtnText}>
+              <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primary }]} onPress={handleGuardarCombustible}>
+                <Text style={[styles.saveBtnText, { color: colors.white }]}>
                   {combEditId !== null ? 'Guardar' : 'Agregar'}
                 </Text>
               </TouchableOpacity>
@@ -300,66 +308,110 @@ export default function ConfiguracionScreen() {
             onPress={() => setShowCombForm(true)}
           >
             <Ionicons name="add-circle-outline" size={20} color={colors.secondary} />
-            <Text style={styles.addCombBtnText}>Agregar combustible</Text>
+            <Text style={[styles.addCombBtnText, { color: colors.secondary }]}>Agregar combustible</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* === Moneda === */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="cash-outline" size={20} color={colors.primary} />
-          <Text style={styles.sectionTitle}>Moneda</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Moneda</Text>
         </View>
-        <Text style={styles.sectionDesc}>
+        <Text style={[styles.sectionDesc, { color: colors.textSecondary }]}>
           Símbolo monetario usado en toda la app.
         </Text>
         <View style={styles.monedaRow}>
           <TextInput
-            style={[styles.input, styles.monedaInput]}
+            style={[styles.input, styles.monedaInput, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
             placeholder="Bs"
             placeholderTextColor={colors.textLight}
             value={monedaInput}
             onChangeText={setMonedaInput}
             maxLength={5}
           />
-          <TouchableOpacity style={styles.saveMonedaBtn} onPress={handleGuardarMoneda}>
+          <TouchableOpacity style={[styles.saveMonedaBtn, { backgroundColor: colors.primary }]} onPress={handleGuardarMoneda}>
             <Ionicons name="checkmark" size={20} color={colors.white} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+      {/* === Apariencia === */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Ionicons name="color-palette-outline" size={20} color={colors.primary} />
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Apariencia</Text>
+        </View>
+        <Text style={[styles.sectionDesc, { color: colors.textSecondary }]}>
+          Selecciona el tema de la aplicación.
+        </Text>
+        <View style={styles.themeRow}>
+          {TEMAS_OPCIONES.map((t) => {
+            const isActive = themeMode === t.value;
+            return (
+              <TouchableOpacity
+                key={t.value}
+                style={[
+                  styles.themeOption,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                  isActive && { borderColor: colors.primary, backgroundColor: colors.primary + '15' },
+                ]}
+                onPress={() => cambiarTema(t.value)}
+              >
+                <Ionicons
+                  name={t.icon}
+                  size={24}
+                  color={isActive ? colors.primary : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.themeOptionText,
+                    { color: isActive ? colors.primary : colors.textSecondary },
+                    isActive && { fontWeight: '600' },
+                  ]}
+                >
+                  {t.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* === Exportar / Importar === */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="cloud-download-outline" size={20} color={colors.primary} />
-          <Text style={styles.sectionTitle}>Exportar / Importar</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Exportar / Importar</Text>
         </View>
-        <Text style={styles.sectionDesc}>
+        <Text style={[styles.sectionDesc, { color: colors.textSecondary }]}>
           Exporta todos tus datos como respaldo o impórtalos desde un archivo.
         </Text>
         <View style={styles.exportRow}>
           <TouchableOpacity
-            style={[styles.exportBtn, exporting && styles.exportBtnDisabled]}
+            style={[styles.exportBtn, { backgroundColor: colors.primary }, exporting && styles.exportBtnDisabled]}
             onPress={handleExportar}
             disabled={exporting}
           >
             <Ionicons name="share-outline" size={20} color={colors.white} />
-            <Text style={styles.exportBtnText}>
+            <Text style={[styles.exportBtnText, { color: colors.white }]}>
               {exporting ? 'Exportando…' : 'Exportar datos'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.exportBtn, styles.importBtn, importing && styles.exportBtnDisabled]}
+            style={[styles.exportBtn, styles.importBtn, { backgroundColor: colors.secondary }, importing && styles.exportBtnDisabled]}
             onPress={handleImportar}
             disabled={importing}
           >
             <Ionicons name="cloud-download-outline" size={20} color={colors.white} />
-            <Text style={styles.exportBtnText}>
+            <Text style={[styles.exportBtnText, { color: colors.white }]}>
               {importing ? 'Importando…' : 'Importar datos'}
             </Text>
           </TouchableOpacity>
@@ -372,7 +424,6 @@ export default function ConfiguracionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: spacing.lg,
@@ -388,15 +439,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
   },
   sectionDesc: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border,
     marginVertical: spacing.lg,
   },
   chipsWrap: {
@@ -408,16 +456,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
   chipText: {
     ...typography.body,
-    color: colors.textPrimary,
   },
   addRow: {
     flexDirection: 'row',
@@ -431,30 +476,24 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   input: {
     ...typography.body,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
-    color: colors.textPrimary,
   },
   combItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: colors.surface,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   combInfo: {
     flex: 1,
@@ -462,12 +501,10 @@ const styles = StyleSheet.create({
   },
   combNombre: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   combDetalle: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
   combActions: {
     flexDirection: 'row',
@@ -477,11 +514,9 @@ const styles = StyleSheet.create({
     padding: 6,
   },
   combForm: {
-    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.border,
     gap: spacing.sm,
   },
   combFormRow: {
@@ -499,23 +534,15 @@ const styles = StyleSheet.create({
   },
   unidadOpt: {
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 10,
   },
-  unidadOptActive: {
-    borderColor: colors.secondary,
-    backgroundColor: colors.secondary + '15',
-  },
+  unidadOptActive: {},
   unidadOptText: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
-  unidadOptTextActive: {
-    color: colors.secondary,
-    fontWeight: '600',
-  },
+  unidadOptTextActive: {},
   combFormActions: {
     flexDirection: 'row',
     gap: spacing.sm,
@@ -526,21 +553,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   cancelBtnText: {
     ...typography.body,
-    color: colors.textSecondary,
   },
   saveBtn: {
     paddingVertical: 10,
     paddingHorizontal: spacing.md,
     borderRadius: 10,
-    backgroundColor: colors.primary,
   },
   saveBtnText: {
     ...typography.body,
-    color: colors.white,
     fontWeight: '600',
   },
   addCombBtn: {
@@ -551,7 +574,6 @@ const styles = StyleSheet.create({
   },
   addCombBtnText: {
     ...typography.body,
-    color: colors.secondary,
     fontWeight: '500',
   },
   monedaRow: {
@@ -569,9 +591,23 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  themeRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  themeOption: {
+    flex: 1,
+    alignItems: 'center',
+    gap: spacing.sm,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingVertical: 14,
+  },
+  themeOptionText: {
+    ...typography.bodySmall,
   },
   exportRow: {
     flexDirection: 'row',
@@ -583,18 +619,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 14,
   },
-  importBtn: {
-    backgroundColor: colors.secondary,
-  },
+  importBtn: {},
   exportBtnDisabled: {
     opacity: 0.6,
   },
   exportBtnText: {
     ...typography.button,
-    color: colors.white,
   },
 });

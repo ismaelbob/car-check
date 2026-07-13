@@ -13,12 +13,14 @@ import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import Constants from 'expo-constants';
-import { colors, typography, spacing } from '../src/theme';
+import { typography, spacing } from '../src/theme';
+import { useTheme } from '../src/context/ThemeContext';
 
 const CUENTA_DONACION = '3500480997';
 
 export default function AcercaDeScreen() {
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: 'Acerca de' });
@@ -31,66 +33,66 @@ export default function AcercaDeScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
     >
       <View style={styles.logoSection}>
-        <View style={styles.logoContainer}>
+        <View style={[styles.logoContainer, { backgroundColor: colors.primary }]}>
           <Image
             source={require('../assets/icon_outline.png')}
             style={styles.logo}
           />
         </View>
-        <Text style={styles.appName}>Car Check</Text>
-        <Text style={styles.version}>Versión {Constants.expoConfig?.version || '1.0.0'}</Text>
+        <Text style={[styles.appName, { color: colors.primary }]}>Car Check</Text>
+        <Text style={[styles.version, { color: colors.textLight }]}>Versión {Constants.expoConfig?.version || '1.0.0'}</Text>
       </View>
 
-      <Text style={styles.description}>
+      <Text style={[styles.description, { color: colors.textSecondary }]}>
         Aplicación para el control y registro de mantenimiento de vehículos,
         cargas de combustible y seguimiento de kilometraje.
       </Text>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="heart-outline" size={20} color={colors.primary} />
-          <Text style={styles.sectionTitle}>Donaciones voluntarias</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Donaciones voluntarias</Text>
         </View>
-        <Text style={styles.sectionDesc}>
+        <Text style={[styles.sectionDesc, { color: colors.textSecondary }]}>
           Si esta aplicación te es útil, puedes apoyar su desarrollo con una
           donación voluntaria. Escanea el código QR para realizar tu depósito.
         </Text>
-        <View style={styles.qrContainer}>
+        <View style={[styles.qrContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Image
             source={require('../assets/qr-donacion.png')}
             style={styles.qrImage}
             resizeMode="contain"
           />
           <View style={styles.accountSection}>
-            <Text style={styles.accountLabel}>O deposita a la cuenta:</Text>
-            <TouchableOpacity style={styles.accountRow} onPress={handleCopyAccount}>
-              <Text style={styles.accountNumber}>{CUENTA_DONACION}</Text>
+            <Text style={[styles.accountLabel, { color: colors.textSecondary }]}>O deposita a la cuenta:</Text>
+            <TouchableOpacity style={[styles.accountRow, { backgroundColor: colors.background, borderColor: colors.border }]} onPress={handleCopyAccount}>
+              <Text style={[styles.accountNumber, { color: colors.textPrimary }]}>{CUENTA_DONACION}</Text>
               <Ionicons name="copy-outline" size={18} color={colors.secondary} />
             </TouchableOpacity>
-            <Text style={styles.accountHint}>Toca el número para copiarlo</Text>
+            <Text style={[styles.accountHint, { color: colors.textLight }]}>Toca el número para copiarlo</Text>
           </View>
         </View>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Ionicons name="person-outline" size={20} color={colors.primary} />
-          <Text style={styles.sectionTitle}>Desarrollado por: Ismael Jancko</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Desarrollado por: Ismael Jancko</Text>
         </View>
         <TouchableOpacity
-          style={styles.contactRow}
+          style={[styles.contactRow, { backgroundColor: colors.surface, borderColor: colors.border }]}
           onPress={() => Linking.openURL('mailto:bobismaeljg@gmail.com')}
         >
           <Ionicons name="mail-outline" size={20} color={colors.secondary} />
-          <Text style={styles.contactText}>bobismaeljg@gmail.com</Text>
+          <Text style={[styles.contactText, { color: colors.secondary }]}>bobismaeljg@gmail.com</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -100,7 +102,6 @@ export default function AcercaDeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     alignItems: 'center',
@@ -117,7 +118,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 24,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
@@ -129,15 +129,12 @@ const styles = StyleSheet.create({
   },
   appName: {
     ...typography.h1,
-    color: colors.primary,
   },
   version: {
     ...typography.body,
-    color: colors.textLight,
   },
   description: {
     ...typography.body,
-    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
     paddingHorizontal: spacing.md,
@@ -145,7 +142,6 @@ const styles = StyleSheet.create({
   divider: {
     width: '100%',
     height: 1,
-    backgroundColor: colors.border,
     marginVertical: spacing.lg,
   },
   section: {
@@ -159,19 +155,15 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
   },
   sectionDesc: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     lineHeight: 20,
   },
   qrContainer: {
     alignItems: 'center',
-    backgroundColor: colors.surface,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: colors.border,
     padding: spacing.lg,
   },
   qrImage: {
@@ -184,7 +176,6 @@ const styles = StyleSheet.create({
   },
   accountLabel: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   accountRow: {
@@ -192,38 +183,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.background,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.border,
     paddingVertical: 12,
     paddingHorizontal: spacing.md,
   },
   accountNumber: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '700',
     fontSize: 18,
     letterSpacing: 1,
   },
   accountHint: {
     ...typography.caption,
-    color: colors.textLight,
     textAlign: 'center',
   },
   contactRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.surface,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.border,
     paddingVertical: 14,
     paddingHorizontal: spacing.md,
   },
   contactText: {
     ...typography.body,
-    color: colors.secondary,
   },
 });

@@ -17,7 +17,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
 import { useConfig } from '../context/ConfigContext';
-import { colors, typography, spacing } from '../theme';
+import { useTheme } from '../context/ThemeContext';
+import { typography, spacing } from '../theme';
 
 const formatDate = (d) => {
   const yyyy = d.getFullYear();
@@ -27,6 +28,7 @@ const formatDate = (d) => {
 };
 
 export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ultimoKilometraje, vehiculoCombustible }) {
+  const { colors } = useTheme();
   const { agregarCargaCombustible } = useVehiculos();
   const { combustibles, moneda } = useConfig();
   const [litros, setLitros] = useState('');
@@ -204,30 +206,30 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <Pressable style={styles.overlay} onPress={handleClose}>
-          <Pressable style={styles.sheet} onPress={() => {}}>
-            <View style={styles.handle} />
-            <Text style={styles.title}>Nueva carga de combustible</Text>
+          <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]} onPress={() => {}}>
+            <View style={[styles.handle, { backgroundColor: colors.border }]} />
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Nueva carga de combustible</Text>
 
             <ScrollView style={styles.form} keyboardShouldPersistTaps="handled">
               <View style={styles.field}>
-                <Text style={styles.label}>Tipo de combustible *</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>Tipo de combustible *</Text>
                 {soloUnaOpcion ? (
-                  <View style={[styles.input, styles.inputDisabled]}>
-                    <Text style={styles.inputDisabledText}>{filteredCombNombres[0]}</Text>
+                  <View style={[styles.input, styles.inputDisabled, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                    <Text style={[styles.inputDisabledText, { color: colors.textSecondary }]}>{filteredCombNombres[0]}</Text>
                   </View>
                 ) : (
                   <TouchableOpacity
-                    style={[styles.input, styles.select]}
+                    style={[styles.input, styles.select, { backgroundColor: colors.background, borderColor: colors.border }]}
                     onPress={() => setTipoPickerVisible(true)}
                   >
-                    <Text style={[!tipoCombustible && { color: colors.textLight }]}>
+                    <Text style={[{ color: colors.textPrimary }, !tipoCombustible && { color: colors.textLight }]}>
                       {tipoCombustible || 'Seleccionar tipo'}
                     </Text>
                     <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
                   </TouchableOpacity>
                 )}
                 {tipoCombustible ? (
-                  <Text style={styles.priceInfo}>
+                  <Text style={[styles.priceInfo, { color: colors.secondary }]}>
                     Precio: {moneda} {precioUnitario.toFixed(2)} / {unidad}
                   </Text>
                 ) : null}
@@ -235,9 +237,9 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
 
               <View style={styles.row}>
                 <View style={[styles.field, styles.fieldHalf]}>
-                  <Text style={styles.label}>Litros / m3 *</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary }]}>Litros / m3 *</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                     placeholder="Ej: 40"
                     placeholderTextColor={colors.textLight}
                     keyboardType="decimal-pad"
@@ -246,9 +248,9 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
                   />
                 </View>
                 <View style={[styles.field, styles.fieldHalf]}>
-                  <Text style={styles.label}>Costo total ({moneda}) *</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary }]}>Costo total ({moneda}) *</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                     placeholder="Ej: 278.40"
                     placeholderTextColor={colors.textLight}
                     keyboardType="decimal-pad"
@@ -259,9 +261,9 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Kilometraje *</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>Kilometraje *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                   placeholder="Ej: 50000"
                   placeholderTextColor={colors.textLight}
                   keyboardType="number-pad"
@@ -271,12 +273,12 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Fecha *</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>Fecha *</Text>
                 <TouchableOpacity
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border }]}
                   onPress={() => setShowDatePicker(true)}
                 >
-                  <Text style={[!fecha && { color: colors.textLight }]}>
+                  <Text style={[{ color: colors.textPrimary }, !fecha && { color: colors.textLight }]}>
                     {fecha || 'Seleccionar fecha'}
                   </Text>
                 </TouchableOpacity>
@@ -300,9 +302,9 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
                 )}
               </View>
 
-              <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleSave}>
                 <Ionicons name="checkmark-circle-outline" size={22} color={colors.white} />
-                <Text style={styles.buttonText}>Guardar</Text>
+                <Text style={[styles.buttonText, { color: colors.white }]}>Guardar</Text>
               </TouchableOpacity>
             </ScrollView>
 
@@ -311,8 +313,8 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
                 style={styles.pickerOverlay}
                 onPress={() => setTipoPickerVisible(false)}
               >
-                <Pressable style={styles.pickerSheet}>
-                  <Text style={styles.pickerTitle}>Tipo de combustible</Text>
+                <Pressable style={[styles.pickerSheet, { backgroundColor: colors.surface }]}>
+                  <Text style={[styles.pickerTitle, { color: colors.textPrimary, borderBottomColor: colors.border }]}>Tipo de combustible</Text>
                   <FlatList
                     data={filteredCombNombres}
                     keyExtractor={(item) => item}
@@ -322,7 +324,7 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
                         <TouchableOpacity
                           style={[
                             styles.pickerOption,
-                            item === tipoCombustible && styles.pickerOptionActive,
+                            item === tipoCombustible && [styles.pickerOptionActive, { backgroundColor: colors.background }],
                           ]}
                           onPress={() => {
                             handleTipoChange(item);
@@ -333,13 +335,14 @@ export default function CargaCombustibleForm({ visible, onClose, vehiculoId, ult
                             <Text
                               style={[
                                 styles.pickerOptionText,
-                                item === tipoCombustible && styles.pickerOptionTextActive,
+                                { color: colors.textPrimary },
+                                item === tipoCombustible && [styles.pickerOptionTextActive, { color: colors.primary }],
                               ]}
                             >
                               {item}
                             </Text>
                             {c && (
-                              <Text style={styles.pickerOptionPrice}>
+                              <Text style={[styles.pickerOptionPrice, { color: colors.textSecondary }]}>
                                 {moneda} {c.precio.toFixed(2)} / {c.unidad}
                               </Text>
                             )}
@@ -371,7 +374,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
@@ -381,14 +383,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
     alignSelf: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.sm,
   },
   title: {
     ...typography.h3,
-    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
@@ -408,18 +408,14 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     fontWeight: '500',
   },
   input: {
     ...typography.body,
-    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: 14,
-    color: colors.textPrimary,
   },
   select: {
     flexDirection: 'row',
@@ -427,21 +423,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   inputDisabled: {
-    backgroundColor: colors.background,
     opacity: 0.7,
   },
   inputDisabledText: {
     ...typography.body,
-    color: colors.textSecondary,
   },
   priceInfo: {
     ...typography.bodySmall,
-    color: colors.secondary,
     fontWeight: '500',
     marginTop: spacing.xs,
   },
   button: {
-    backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -453,7 +445,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...typography.button,
-    color: colors.white,
   },
   pickerOverlay: {
     flex: 1,
@@ -461,7 +452,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   pickerSheet: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingVertical: spacing.md,
@@ -470,11 +460,9 @@ const styles = StyleSheet.create({
   },
   pickerTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
     textAlign: 'center',
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
     marginHorizontal: spacing.lg,
   },
   pickerOption: {
@@ -485,21 +473,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   pickerOptionActive: {
-    backgroundColor: colors.background,
   },
   pickerOptionContent: {
     gap: 2,
   },
   pickerOptionText: {
     ...typography.body,
-    color: colors.textPrimary,
   },
   pickerOptionTextActive: {
-    color: colors.primary,
     fontWeight: '600',
   },
   pickerOptionPrice: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
 });

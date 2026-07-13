@@ -4,11 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
 import { useConfig } from '../context/ConfigContext';
 import ConfirmDeleteRecordModal from './ConfirmDeleteRecordModal';
-import { colors, typography, spacing } from '../theme';
+import { typography, spacing } from '../theme';
+import { useTheme } from '../context/ThemeContext';
 
 export default function CargaCombustibleCard({ carga, vehiculoId }) {
   const { eliminarCargaCombustible } = useVehiculos();
   const { combustibles, moneda } = useConfig();
+  const { colors } = useTheme();
   const [deleteVisible, setDeleteVisible] = useState(false);
   const litros = parseFloat(carga.litros) || 0;
   const costoTotal = parseFloat(carga.costo) || 0;
@@ -25,11 +27,11 @@ export default function CargaCombustibleCard({ carga, vehiculoId }) {
   const info = `${tipo} — ${carga.litros} ${unidad}`;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <View style={styles.header}>
         <View style={styles.tipoRow}>
           <Ionicons name="flame-outline" size={22} color={colors.warning} />
-          <Text style={styles.tipo}>{tipo}</Text>
+          <Text style={[styles.tipo, { color: colors.textPrimary }]}>{tipo}</Text>
         </View>
         <TouchableOpacity onPress={() => setDeleteVisible(true)} hitSlop={10}>
           <Ionicons name="trash-outline" size={18} color={colors.textLight} />
@@ -37,22 +39,22 @@ export default function CargaCombustibleCard({ carga, vehiculoId }) {
       </View>
 
       <View style={styles.amountRow}>
-        <Text style={styles.litros}>{carga.litros} {unidad}</Text>
-        <Text style={styles.total}>{moneda} {carga.costo}</Text>
+        <Text style={[styles.litros, { color: colors.warning }]}>{carga.litros} {unidad}</Text>
+        <Text style={[styles.total, { color: colors.textPrimary }]}>{moneda} {carga.costo}</Text>
       </View>
 
       <View style={styles.details}>
         <View style={styles.detailItem}>
           <Ionicons name="speedometer-outline" size={14} color={colors.textSecondary} />
-          <Text style={styles.detailText}>{carga.kilometraje} km</Text>
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{carga.kilometraje} km</Text>
         </View>
         <View style={styles.detailItem}>
           <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-          <Text style={styles.detailText}>{carga.fecha}</Text>
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{carga.fecha}</Text>
         </View>
         <View style={styles.detailItem}>
           <Ionicons name="pricetag-outline" size={14} color={colors.textSecondary} />
-          <Text style={styles.detailText}>{moneda} {precioPorLitro}/{unidad}</Text>
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{moneda} {precioPorLitro}/{unidad}</Text>
         </View>
       </View>
 
@@ -70,7 +72,6 @@ export default function CargaCombustibleCard({ carga, vehiculoId }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -93,7 +94,6 @@ const styles = StyleSheet.create({
   },
   tipo: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   amountRow: {
@@ -103,11 +103,9 @@ const styles = StyleSheet.create({
   },
   litros: {
     ...typography.h2,
-    color: colors.warning,
   },
   total: {
     ...typography.h3,
-    color: colors.textPrimary,
   },
   details: {
     flexDirection: 'row',
@@ -121,6 +119,5 @@ const styles = StyleSheet.create({
   },
   detailText: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
 });

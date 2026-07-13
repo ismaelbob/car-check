@@ -1,15 +1,22 @@
 import { useEffect } from 'react';
+import { StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
 import { VehiculoProvider, useVehiculos } from '../src/context/VehiculoContext';
 import { ConfigProvider } from '../src/context/ConfigContext';
-import { colors } from '../src/theme';
+import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 
 SplashScreen.preventAutoHideAsync();
 
 function AppContent() {
   const { isReady } = useVehiculos();
+  const { isDark, colors } = useTheme();
+
+  const navigationTheme = isDark
+    ? { ...DarkTheme, colors: { ...DarkTheme.colors, background: colors.background, card: colors.surface } }
+    : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: colors.background, card: colors.surface } };
 
   useEffect(() => {
     if (isReady) {
@@ -17,10 +24,14 @@ function AppContent() {
     }
   }, [isReady]);
 
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(colors.background);
+    StatusBar.setBarStyle('light-content');
+  }, [colors.background]);
+
   return (
     <>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack theme={navigationTheme} screenOptions={{ headerShown: false, statusBarStyle: 'light' }} contentStyle={{ backgroundColor: colors.background }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
@@ -57,10 +68,12 @@ function AppContent() {
 
 export default function RootLayout() {
   return (
-    <VehiculoProvider>
-      <ConfigProvider>
-        <AppContent />
-      </ConfigProvider>
-    </VehiculoProvider>
+    <ThemeProvider>
+      <VehiculoProvider>
+        <ConfigProvider>
+          <AppContent />
+        </ConfigProvider>
+      </VehiculoProvider>
+    </ThemeProvider>
   );
 }

@@ -1,12 +1,14 @@
 import { useRef } from 'react';
 import { StyleSheet, View, FlatList, Dimensions } from 'react-native';
 import VehicleCard from './VehicleCard';
-import { colors, spacing } from '../theme';
+import { spacing } from '../theme';
+import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 export default function VehicleCarousel({ vehiculos, vehiculoActivo, onIndexChange, ultimoKilometraje = '' }) {
   const ref = useRef(null);
+  const { colors } = useTheme();
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
@@ -53,6 +55,7 @@ export default function VehicleCarousel({ vehiculos, vehiculoActivo, onIndexChan
             key={index}
             style={[
               styles.dot,
+              { backgroundColor: index === vehiculoActivo ? colors.primary : colors.border },
               index === vehiculoActivo && styles.dotActive,
             ]}
           />
@@ -80,11 +83,9 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: colors.border,
   },
   dotActive: {
     width: 28,
     borderRadius: 5,
-    backgroundColor: colors.primary,
   },
 });

@@ -4,16 +4,18 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
 import DeleteVehicleModal from './DeleteVehicleModal';
-import { colors, typography, spacing } from '../theme';
+import { typography, spacing } from '../theme';
+import { useTheme } from '../context/ThemeContext';
 
 export default function VehicleCard({ vehiculo, ultimoKilometraje, kilometrosRecorridos }) {
   const router = useRouter();
   const { eliminarVehiculo } = useVehiculos();
+  const { colors } = useTheme();
   const [menuVisible, setMenuVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface }]}>
       <TouchableOpacity
         style={styles.menuButton}
         onPress={() => setMenuVisible(true)}
@@ -31,59 +33,59 @@ export default function VehicleCard({ vehiculo, ultimoKilometraje, kilometrosRec
 
       <View style={styles.infoContainer}>
         <View style={styles.row}>
-          <Text style={styles.label}>Marca</Text>
-          <Text style={styles.value}>{vehiculo.marca}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Marca</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{vehiculo.marca}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Modelo</Text>
-          <Text style={styles.value}>{vehiculo.modelo}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Modelo</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{vehiculo.modelo}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Tipo</Text>
-          <Text style={styles.value}>{vehiculo.tipo}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Tipo</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{vehiculo.tipo}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Año</Text>
-          <Text style={styles.value}>{vehiculo.año}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Año</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{vehiculo.año}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Color</Text>
-          <Text style={styles.value}>{vehiculo.color}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Color</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{vehiculo.color}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Placa</Text>
-          <Text style={styles.value}>{vehiculo.placa}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Placa</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{vehiculo.placa}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Combustible</Text>
-          <Text style={styles.value}>{vehiculo.combustible ? vehiculo.combustible.replace(/,/g, ' + ') : 'Gasolina'}</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Combustible</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{vehiculo.combustible ? vehiculo.combustible.replace(/,/g, ' + ') : 'Gasolina'}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Kilometraje inicial</Text>
-          <Text style={styles.value}>{parseFloat(vehiculo.kilometrajeInicial).toLocaleString()} km</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Kilometraje inicial</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{parseFloat(vehiculo.kilometrajeInicial).toLocaleString()} km</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={styles.label}>Último kilometraje</Text>
-          <Text style={styles.value}>{ultimoKilometraje.toLocaleString()} km</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Último kilometraje</Text>
+          <Text style={[styles.value, { color: colors.textPrimary }]}>{ultimoKilometraje.toLocaleString()} km</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.row}>
-          <Text style={[styles.label, styles.highlightedLabel]}>Kilómetros recorridos</Text>
-          <Text style={[styles.value, styles.highlightedValue]}>+{kilometrosRecorridos.toLocaleString()} km</Text>
+          <Text style={[styles.label, styles.highlightedLabel, { color: colors.primary }]}>Kilómetros recorridos</Text>
+          <Text style={[styles.value, styles.highlightedValue, { color: colors.secondary }]}>+{kilometrosRecorridos.toLocaleString()} km</Text>
         </View>
       </View>
 
       <Modal visible={menuVisible} transparent animationType="fade">
         <Pressable style={styles.overlay} onPress={() => setMenuVisible(false)}>
-          <Pressable style={styles.sheet}>
+          <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]}>
             <TouchableOpacity
               style={styles.sheetOption}
               onPress={() => {
@@ -92,9 +94,9 @@ export default function VehicleCard({ vehiculo, ultimoKilometraje, kilometrosRec
               }}
             >
               <Ionicons name="create-outline" size={22} color={colors.primary} />
-              <Text style={styles.sheetOptionText}>Modificar datos</Text>
+              <Text style={[styles.sheetOptionText, { color: colors.textPrimary }]}>Modificar datos</Text>
             </TouchableOpacity>
-            <View style={styles.sheetDivider} />
+            <View style={[styles.sheetDivider, { backgroundColor: colors.border }]} />
             <TouchableOpacity
               style={styles.sheetOption}
               onPress={() => {
@@ -107,7 +109,7 @@ export default function VehicleCard({ vehiculo, ultimoKilometraje, kilometrosRec
                 Eliminar
               </Text>
             </TouchableOpacity>
-            <View style={styles.sheetDivider} />
+            <View style={[styles.sheetDivider, { backgroundColor: colors.border }]} />
             <TouchableOpacity
               style={styles.sheetOption}
               onPress={() => setMenuVisible(false)}
@@ -132,13 +134,13 @@ export default function VehicleCard({ vehiculo, ultimoKilometraje, kilometrosRec
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
     borderRadius: 12,
     marginHorizontal: spacing.md,
+    marginTop: spacing.md,
     paddingBottom: spacing.xl,
     paddingTop: spacing.lg,
     paddingHorizontal: spacing.lg,
-    shadowColor: '#fff',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0,
     shadowRadius: 0,
@@ -176,26 +178,21 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     flex: 1,
   },
   value: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '500',
     flex: 1,
     textAlign: 'right',
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border,
   },
   highlightedLabel: {
     fontWeight: '700',
-    color: colors.primary,
   },
   highlightedValue: {
-    color: colors.secondary,
     fontWeight: '700',
   },
   overlay: {
@@ -204,7 +201,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingVertical: spacing.md,
@@ -219,11 +215,9 @@ const styles = StyleSheet.create({
   },
   sheetOptionText: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '500',
   },
   sheetDivider: {
     height: 1,
-    backgroundColor: colors.border,
   },
 });

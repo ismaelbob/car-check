@@ -7,7 +7,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../../src/context/VehiculoContext';
-import { colors, typography, spacing } from '../../src/theme';
+import { typography, spacing } from '../../src/theme';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const ICONOS_TIPO = {
   Aceite: 'water-outline',
@@ -76,6 +77,8 @@ export default function ProximosCambiosScreen() {
     cargasCombustible,
     cargarHistorial,
   } = useVehiculos();
+
+  const { colors } = useTheme();
 
   const vehiculo = vehiculos[vehiculoActivo];
 
@@ -196,10 +199,10 @@ export default function ProximosCambiosScreen() {
 
   if (!vehiculo) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={[styles.emptyContainer, { backgroundColor: colors.background }]}>
         <Ionicons name="construct-outline" size={80} color={colors.textLight} />
-        <Text style={styles.emptyTitle}>Sin vehículo activo</Text>
-        <Text style={styles.emptySubtitle}>
+        <Text style={[styles.emptyTitle, { color: colors.primary }]}>Sin vehículo activo</Text>
+        <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
           Agrega un vehículo en Inicio para ver tus próximos cambios
         </Text>
       </View>
@@ -208,22 +211,22 @@ export default function ProximosCambiosScreen() {
 
   if (mantenimientos.length === 0) {
     return (
-      <View style={styles.container}>
-        <View style={styles.vehicleHeader}>
-          <View style={styles.vehicleIcon}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={[styles.vehicleHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <View style={[styles.vehicleIcon, { backgroundColor: colors.background }]}>
             <Ionicons name="car-sport-outline" size={20} color={colors.primary} />
           </View>
           <View>
-            <Text style={styles.vehicleName}>
+            <Text style={[styles.vehicleName, { color: colors.textPrimary }]}>
               {vehiculo.marca} {vehiculo.modelo}
             </Text>
-            <Text style={styles.vehiclePlate}>{vehiculo.placa}</Text>
+            <Text style={[styles.vehiclePlate, { color: colors.textSecondary }]}>{vehiculo.placa}</Text>
           </View>
         </View>
         <View style={styles.emptyTab}>
           <Ionicons name="analytics-outline" size={64} color={colors.textLight} />
-          <Text style={styles.emptyTabTitle}>Sin mantenimientos registrados</Text>
-          <Text style={styles.emptyTabSubtitle}>
+          <Text style={[styles.emptyTabTitle, { color: colors.textPrimary }]}>Sin mantenimientos registrados</Text>
+          <Text style={[styles.emptyTabSubtitle, { color: colors.textSecondary }]}>
             Agrega mantenimientos en la sección Historial para comenzar a ver sugerencias
           </Text>
         </View>
@@ -232,16 +235,16 @@ export default function ProximosCambiosScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.vehicleHeader}>
-        <View style={styles.vehicleIcon}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.vehicleHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={[styles.vehicleIcon, { backgroundColor: colors.background }]}>
           <Ionicons name="car-sport-outline" size={20} color={colors.primary} />
         </View>
         <View>
-          <Text style={styles.vehicleName}>
+          <Text style={[styles.vehicleName, { color: colors.textPrimary }]}>
             {vehiculo.marca} {vehiculo.modelo}
           </Text>
-          <Text style={styles.vehiclePlate}>{vehiculo.placa}</Text>
+          <Text style={[styles.vehiclePlate, { color: colors.textSecondary }]}>{vehiculo.placa}</Text>
         </View>
       </View>
 
@@ -253,7 +256,7 @@ export default function ProximosCambiosScreen() {
           const accentColor = isOverdue ? colors.error : item.hasPrediction ? colors.warning : colors.textLight;
 
           return (
-            <View style={[styles.card, isOverdue && styles.cardOverdue]}>
+            <View style={[styles.card, { backgroundColor: colors.surface }, isOverdue && { borderLeftWidth: 3, borderLeftColor: colors.error }]}>
               <View style={styles.cardHeader}>
                 <View style={styles.tipoRow}>
                   <View style={[styles.iconCircle, { borderColor: accentColor }]}>
@@ -264,13 +267,13 @@ export default function ProximosCambiosScreen() {
                     />
                   </View>
                   <View>
-                    <Text style={styles.tipo}>{item.tipo}</Text>
+                    <Text style={[styles.tipo, { color: colors.textPrimary }]}>{item.tipo}</Text>
                     {item.hasPrediction ? (
-                      <Text style={styles.sinceInfo}>
+                      <Text style={[styles.sinceInfo, { color: colors.textLight }]}>
                         Basado en {item.pairs + 1} registros
                       </Text>
                     ) : (
-                      <Text style={styles.sinceInfo}>
+                      <Text style={[styles.sinceInfo, { color: colors.textLight }]}>
                         1 registro — sin proyección
                       </Text>
                     )}
@@ -287,34 +290,34 @@ export default function ProximosCambiosScreen() {
 
               <View style={styles.details}>
                 <View style={styles.detailCol}>
-                  <Text style={styles.detailLabel}>Último cambio</Text>
-                  <Text style={styles.detailValue}>{Number(item.lastKm).toLocaleString()} km</Text>
-                  <Text style={styles.detailDate}>{item.lastDate}</Text>
-                  <Text style={styles.detailDate}>{formatTimeAgo(item.diasDesde)}</Text>
+                  <Text style={[styles.detailLabel, { color: colors.textLight }]}>Último cambio</Text>
+                  <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{Number(item.lastKm).toLocaleString()} km</Text>
+                  <Text style={[styles.detailDate, { color: colors.textSecondary }]}>{item.lastDate}</Text>
+                  <Text style={[styles.detailDate, { color: colors.textSecondary }]}>{formatTimeAgo(item.diasDesde)}</Text>
                 </View>
                 {item.hasPrediction && (
                   <>
                     <Ionicons name="arrow-forward" size={18} color={colors.textLight} style={styles.arrow} />
                     <View style={styles.detailCol}>
-                      <Text style={styles.detailLabel}>Próximo sugerido</Text>
-                      <Text style={styles.detailValue}>{Number(item.nextKm).toLocaleString()} km</Text>
-                      <Text style={styles.detailDate}>{item.nextDate}</Text>
+                      <Text style={[styles.detailLabel, { color: colors.textLight }]}>Próximo sugerido</Text>
+                      <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{Number(item.nextKm).toLocaleString()} km</Text>
+                      <Text style={[styles.detailDate, { color: colors.textSecondary }]}>{item.nextDate}</Text>
                     </View>
                   </>
                 )}
               </View>
 
               {item.hasPrediction && (
-                <View style={styles.remainingRow}>
+                <View style={[styles.remainingRow, { borderTopColor: colors.border }]}>
                   <View style={styles.remainingItem}>
                     <Ionicons name="speedometer-outline" size={16} color={accentColor} />
-                    <Text style={[styles.remainingText, isOverdue && styles.remainingOverdue]}>
+                    <Text style={[styles.remainingText, { color: colors.textSecondary }, isOverdue && { color: colors.error }]}>
                       {`${Number(Math.abs(item.kmRemaining)).toLocaleString()} km ${isOverdue ? 'excedido' : 'restantes'}`}
                     </Text>
                   </View>
                   <View style={styles.remainingItem}>
                     <Ionicons name="calendar-outline" size={16} color={accentColor} />
-                    <Text style={[styles.remainingText, isOverdue && styles.remainingOverdue]}>
+                    <Text style={[styles.remainingText, { color: colors.textSecondary }, isOverdue && { color: colors.error }]}>
                       {formatTimeRemaining(item.daysRemaining)}
                     </Text>
                   </View>
@@ -333,11 +336,9 @@ export default function ProximosCambiosScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   emptyContainer: {
     flex: 1,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xl,
@@ -345,12 +346,10 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typography.h2,
-    color: colors.primary,
     marginTop: spacing.md,
   },
   emptySubtitle: {
     ...typography.body,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   emptyTab: {
@@ -362,40 +361,33 @@ const styles = StyleSheet.create({
   },
   emptyTabTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
     marginTop: spacing.md,
   },
   emptyTabSubtitle: {
     ...typography.body,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   vehicleHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.surface,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   vehicleIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
   vehicleName: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   vehiclePlate: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
   list: {
     paddingHorizontal: spacing.lg,
@@ -403,7 +395,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   card: {
-    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -413,10 +404,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
-  },
-  cardOverdue: {
-    borderLeftWidth: 3,
-    borderLeftColor: colors.error,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -438,12 +425,10 @@ const styles = StyleSheet.create({
   },
   tipo: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   sinceInfo: {
     ...typography.caption,
-    color: colors.textLight,
     marginTop: 2,
   },
   badge: {
@@ -465,17 +450,14 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     ...typography.caption,
-    color: colors.textLight,
     marginBottom: 2,
   },
   detailValue: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   detailDate: {
     ...typography.caption,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   arrow: {
@@ -486,7 +468,6 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
   remainingItem: {
     flexDirection: 'row',
@@ -495,10 +476,6 @@ const styles = StyleSheet.create({
   },
   remainingText: {
     ...typography.caption,
-    color: colors.textSecondary,
     fontWeight: '500',
-  },
-  remainingOverdue: {
-    color: colors.error,
   },
 });

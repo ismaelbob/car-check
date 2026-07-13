@@ -2,11 +2,11 @@
   "expo": {
     "name": "Car Check",
     "slug": "car-check",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "backgroundColor": "#F5F7FA",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#000000",
     "newArchEnabled": true,
     "scheme": "car-check",
     "splash": {
@@ -15,7 +15,11 @@
       "backgroundColor": "#1B2A4A"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ismaelbob.carcheck"
+    },
+    "androidStatusBar": {
+      "translucent": true
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +35,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-system-ui"
     ],
     "extra": {
       "router": {},

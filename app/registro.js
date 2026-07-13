@@ -18,7 +18,8 @@ import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useVehiculos } from '../src/context/VehiculoContext';
-import { colors, typography, spacing } from '../src/theme';
+import { typography, spacing } from '../src/theme';
+import { useTheme } from '../src/context/ThemeContext';
 
 const TIPOS_OPCIONES = [
   'Sedan',
@@ -40,6 +41,7 @@ export default function RegistroScreen() {
   const navigation = useNavigation();
   const { id } = useLocalSearchParams();
   const { agregarVehiculo, actualizarVehiculo, obtenerVehiculoPorId } = useVehiculos();
+  const { colors } = useTheme();
   const esEdicion = !!id;
 
   useLayoutEffect(() => {
@@ -151,7 +153,7 @@ export default function RegistroScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={[styles.flex, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
@@ -160,7 +162,7 @@ export default function RegistroScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.photoSection}>
-          <View style={styles.photoPreview}>
+          <View style={[styles.photoPreview, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             {foto ? (
               <Image source={{ uri: foto }} style={styles.photoImage} />
             ) : (
@@ -169,13 +171,13 @@ export default function RegistroScreen() {
           </View>
 
           <View style={styles.photoButtons}>
-            <TouchableOpacity style={styles.photoButton} onPress={takePhoto}>
+            <TouchableOpacity style={[styles.photoButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={takePhoto}>
               <Ionicons name="camera-outline" size={20} color={colors.primary} />
-              <Text style={styles.photoButtonText}>Cámara</Text>
+              <Text style={[styles.photoButtonText, { color: colors.primary }]}>Cámara</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.photoButton} onPress={pickFromGallery}>
+            <TouchableOpacity style={[styles.photoButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={pickFromGallery}>
               <Ionicons name="images-outline" size={20} color={colors.primary} />
-              <Text style={styles.photoButtonText}>Galería</Text>
+              <Text style={[styles.photoButtonText, { color: colors.primary }]}>Galería</Text>
             </TouchableOpacity>
             {foto && (
               <TouchableOpacity style={styles.photoButton} onPress={() => setFoto(null)}>
@@ -188,9 +190,9 @@ export default function RegistroScreen() {
 
         <View style={styles.form}>
           <View style={styles.field}>
-            <Text style={styles.label}>Marca</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Marca</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
               placeholder="Ej: Toyota"
               placeholderTextColor={colors.textLight}
               value={marca}
@@ -199,9 +201,9 @@ export default function RegistroScreen() {
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>Modelo</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Modelo</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
               placeholder="Ej: Corolla"
               placeholderTextColor={colors.textLight}
               value={modelo}
@@ -210,9 +212,9 @@ export default function RegistroScreen() {
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>Tipo</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Tipo</Text>
             <TouchableOpacity
-              style={[styles.input, styles.select]}
+              style={[styles.input, styles.select, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
               onPress={() => setTipoPickerVisible(true)}
             >
               <Text style={[!tipo && { color: colors.textLight }]}>
@@ -224,9 +226,9 @@ export default function RegistroScreen() {
 
           <View style={styles.row}>
             <View style={[styles.field, styles.fieldHalf]}>
-              <Text style={styles.label}>Año</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Año</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
                 placeholder="Ej: 2020"
                 placeholderTextColor={colors.textLight}
                 keyboardType="number-pad"
@@ -236,9 +238,9 @@ export default function RegistroScreen() {
               />
             </View>
             <View style={[styles.field, styles.fieldHalf]}>
-              <Text style={styles.label}>Color</Text>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Color</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
                 placeholder="Ej: Rojo"
                 placeholderTextColor={colors.textLight}
                 value={color}
@@ -248,9 +250,9 @@ export default function RegistroScreen() {
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>Placa</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Placa</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
               placeholder="Ej: ABC-1234"
               placeholderTextColor={colors.textLight}
               autoCapitalize="characters"
@@ -260,9 +262,9 @@ export default function RegistroScreen() {
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>Kilometraje inicial</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Kilometraje inicial</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
               placeholder="Ej: 50000"
               placeholderTextColor={colors.textLight}
               keyboardType="number-pad"
@@ -272,18 +274,23 @@ export default function RegistroScreen() {
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>Combustible</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Combustible</Text>
             <View style={styles.chipsRow}>
               {TIPOS_COMBUSTIBLE.map((item) => {
                 const active = combustibles.includes(item);
                 return (
                   <TouchableOpacity
                     key={item}
-                    style={[styles.chip, active && styles.chipActive]}
+                    style={[
+                      styles.chip,
+                      { borderColor: colors.border, backgroundColor: colors.surface },
+                      active && styles.chipActive,
+                      active && { borderColor: colors.secondary, backgroundColor: colors.secondary + '15' },
+                    ]}
                     onPress={() => toggleCombustible(item)}
                     activeOpacity={0.7}
                   >
-                    <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                    <Text style={[styles.chipText, { color: colors.textSecondary }, active && styles.chipTextActive, active && { color: colors.secondary }]}>
                       {item}
                     </Text>
                   </TouchableOpacity>
@@ -292,9 +299,9 @@ export default function RegistroScreen() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleGuardar}>
+          <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleGuardar}>
             <Ionicons name="checkmark-circle-outline" size={22} color={colors.white} />
-            <Text style={styles.buttonText}>
+            <Text style={[styles.buttonText, { color: colors.white }]}>
               {esEdicion ? 'Guardar cambios' : 'Guardar'}
             </Text>
           </TouchableOpacity>
@@ -306,8 +313,8 @@ export default function RegistroScreen() {
           style={styles.pickerOverlay}
           onPress={() => setTipoPickerVisible(false)}
         >
-          <Pressable style={styles.pickerSheet}>
-            <Text style={styles.pickerTitle}>Seleccionar tipo</Text>
+          <Pressable style={[styles.pickerSheet, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.pickerTitle, { color: colors.textPrimary, borderBottomColor: colors.border }]}>Seleccionar tipo</Text>
             <FlatList
               data={TIPOS_OPCIONES}
               keyExtractor={(item) => item}
@@ -316,6 +323,7 @@ export default function RegistroScreen() {
                   style={[
                     styles.pickerOption,
                     item === tipo && styles.pickerOptionActive,
+                    item === tipo && { backgroundColor: colors.background },
                   ]}
                   onPress={() => {
                     setTipo(item);
@@ -325,7 +333,9 @@ export default function RegistroScreen() {
                   <Text
                     style={[
                       styles.pickerOptionText,
+                      { color: colors.textPrimary },
                       item === tipo && styles.pickerOptionTextActive,
+                      item === tipo && { color: colors.primary },
                     ]}
                   >
                     {item}
@@ -346,7 +356,6 @@ export default function RegistroScreen() {
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: spacing.lg,
@@ -367,9 +376,7 @@ const styles = StyleSheet.create({
     width: 160,
     height: 120,
     borderRadius: 12,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
@@ -388,16 +395,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 14,
   },
   photoButtonText: {
     ...typography.bodySmall,
-    color: colors.primary,
     fontWeight: '500',
   },
   form: {
@@ -415,18 +419,14 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     fontWeight: '500',
   },
   input: {
     ...typography.body,
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: 14,
-    color: colors.textPrimary,
   },
   select: {
     flexDirection: 'row',
@@ -439,7 +439,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   pickerSheet: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingVertical: spacing.md,
@@ -448,11 +447,9 @@ const styles = StyleSheet.create({
   },
   pickerTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
     textAlign: 'center',
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
     marginHorizontal: spacing.lg,
   },
   pickerOption: {
@@ -462,15 +459,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: spacing.lg,
   },
-  pickerOptionActive: {
-    backgroundColor: colors.background,
-  },
+  pickerOptionActive: {},
   pickerOptionText: {
     ...typography.body,
-    color: colors.textPrimary,
   },
   pickerOptionTextActive: {
-    color: colors.primary,
     fontWeight: '600',
   },
   chipsRow: {
@@ -480,26 +473,18 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: spacing.md,
-    backgroundColor: colors.surface,
   },
-  chipActive: {
-    borderColor: colors.secondary,
-    backgroundColor: colors.secondary + '15',
-  },
+  chipActive: {},
   chipText: {
     ...typography.body,
-    color: colors.textSecondary,
   },
   chipTextActive: {
-    color: colors.secondary,
     fontWeight: '600',
   },
   button: {
-    backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -510,6 +495,5 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...typography.button,
-    color: colors.white,
   },
 });

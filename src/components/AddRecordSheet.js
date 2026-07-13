@@ -1,13 +1,16 @@
 import { StyleSheet, Text, View, TouchableOpacity, Modal, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing } from '../theme';
+import { typography, spacing } from '../theme';
+import { useTheme } from '../context/ThemeContext';
 
 export default function AddRecordSheet({ visible, onClose, onSelectMantenimiento, onSelectCarga }) {
+  const { colors } = useTheme();
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={styles.sheet}>
-          <Text style={styles.title}>Agregar registro</Text>
+        <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Agregar registro</Text>
 
           <TouchableOpacity
             style={styles.option}
@@ -19,14 +22,14 @@ export default function AddRecordSheet({ visible, onClose, onSelectMantenimiento
             <View style={[styles.iconCircle, { backgroundColor: colors.secondary + '20' }]}>
               <Ionicons name="settings-outline" size={24} color={colors.secondary} />
             </View>
-            <View style={styles.optionInfo}>
-              <Text style={styles.optionTitle}>Mantenimiento</Text>
-              <Text style={styles.optionDesc}>Aceite, frenos, llantas, etc.</Text>
-            </View>
+            <TouchableOpacity style={styles.optionInfo}>
+              <Text style={[styles.optionTitle, { color: colors.textPrimary }]}>Mantenimiento</Text>
+              <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>Aceite, frenos, llantas, etc.</Text>
+            </TouchableOpacity>
             <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
           </TouchableOpacity>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
           <TouchableOpacity
             style={styles.option}
@@ -38,15 +41,15 @@ export default function AddRecordSheet({ visible, onClose, onSelectMantenimiento
             <View style={[styles.iconCircle, { backgroundColor: colors.warning + '20' }]}>
               <Ionicons name="flame-outline" size={24} color={colors.warning} />
             </View>
-            <View style={styles.optionInfo}>
-              <Text style={styles.optionTitle}>Carga de combustible</Text>
-              <Text style={styles.optionDesc}>Registra litros, costo y kilometraje</Text>
-            </View>
+            <TouchableOpacity style={styles.optionInfo}>
+              <Text style={[styles.optionTitle, { color: colors.textPrimary }]}>Carga de combustible</Text>
+              <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>Registra litros, costo y kilometraje</Text>
+            </TouchableOpacity>
             <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-            <Text style={styles.cancelText}>Cancelar</Text>
+            <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancelar</Text>
           </TouchableOpacity>
         </Pressable>
       </Pressable>
@@ -61,7 +64,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingVertical: spacing.md,
@@ -70,7 +72,6 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.h3,
-    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.lg,
   },
@@ -93,16 +94,13 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   optionDesc: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.border,
   },
   cancelButton: {
     alignItems: 'center',
@@ -111,6 +109,5 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     ...typography.body,
-    color: colors.textSecondary,
   },
 });

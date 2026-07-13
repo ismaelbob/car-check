@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useVehiculos } from '../../src/context/VehiculoContext';
 import VehicleCard from '../../src/components/VehicleCard';
-import { colors } from '../../src/theme';
+import { useTheme } from '../../src/context/ThemeContext';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -15,6 +15,7 @@ export default function HomeScreen() {
     cargarHistorial,
   } = useVehiculos();
 
+  const { colors } = useTheme();
   const vehiculo = vehiculos[vehiculoActivo];
 
   useEffect(() => {
@@ -40,11 +41,11 @@ export default function HomeScreen() {
   }, [vehiculo?.kilometrajeInicial, mantenimientos, cargasCombustible]);
 
   if (!vehiculo) {
-    return <View style={styles.container} />;
+    return <View style={[styles.container, { backgroundColor: colors.background }]} />;
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <VehicleCard
         vehiculo={vehiculo}
         ultimoKilometraje={kmData.ultimo}
@@ -57,6 +58,5 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
 });

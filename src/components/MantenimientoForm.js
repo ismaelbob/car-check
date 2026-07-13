@@ -17,7 +17,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { useVehiculos } from '../context/VehiculoContext';
 import { useConfig } from '../context/ConfigContext';
-import { colors, typography, spacing } from '../theme';
+import { typography, spacing } from '../theme';
+import { useTheme } from '../context/ThemeContext';
 
 const formatDate = (d) => {
   const yyyy = d.getFullYear();
@@ -29,6 +30,7 @@ const formatDate = (d) => {
 export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimoKilometraje }) {
   const { agregarMantenimiento } = useVehiculos();
   const { tiposMantenimiento, moneda, agregarTipoMantenimiento } = useConfig();
+  const { colors } = useTheme();
   const [tipo, setTipo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [kilometraje, setKilometraje] = useState('');
@@ -118,18 +120,18 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <Pressable style={styles.overlay} onPress={handleClose}>
-          <Pressable style={styles.sheet} onPress={() => {}}>
-            <View style={styles.handle} />
-            <Text style={styles.title}>Nuevo mantenimiento</Text>
+          <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]} onPress={() => {}}>
+            <View style={[styles.handle, { backgroundColor: colors.border }]} />
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Nuevo mantenimiento</Text>
 
             <ScrollView style={styles.form} keyboardShouldPersistTaps="handled">
               <View style={styles.field}>
-                <Text style={styles.label}>Tipo *</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>Tipo *</Text>
                 <TouchableOpacity
-                  style={[styles.input, styles.select]}
+                  style={[styles.input, styles.select, { backgroundColor: colors.background, borderColor: colors.border }]}
                   onPress={openTipoPicker}
                 >
-                  <Text style={[!tipo && { color: colors.textLight }]}>
+                  <Text style={[{ color: colors.textPrimary }, !tipo && { color: colors.textLight }]}>
                     {tipo || 'Seleccionar tipo'}
                   </Text>
                   <Ionicons name="chevron-down" size={18} color={colors.textSecondary} />
@@ -137,9 +139,9 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Descripción</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>Descripción</Text>
                 <TextInput
-                  style={[styles.input, styles.textArea]}
+                  style={[styles.input, styles.textArea, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                   placeholder="Ej: Cambio de aceite sintético 5W-30"
                   placeholderTextColor={colors.textLight}
                   multiline
@@ -150,9 +152,9 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Kilometraje *</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>Kilometraje *</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                   placeholder="Ej: 50000"
                   placeholderTextColor={colors.textLight}
                   keyboardType="number-pad"
@@ -162,12 +164,12 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Fecha *</Text>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>Fecha *</Text>
                 <TouchableOpacity
-                  style={styles.input}
+                  style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border }]}
                   onPress={() => setShowDatePicker(true)}
                 >
-                  <Text style={[!fecha && { color: colors.textLight }]}>
+                  <Text style={[{ color: colors.textPrimary }, !fecha && { color: colors.textLight }]}>
                     {fecha || 'Seleccionar fecha'}
                   </Text>
                 </TouchableOpacity>
@@ -193,9 +195,9 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
 
               <View style={styles.row}>
                 <View style={[styles.field, styles.fieldHalf]}>
-                  <Text style={styles.label}>Costo ({moneda})</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary }]}>Costo ({moneda})</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                     placeholder="Ej: 850"
                     placeholderTextColor={colors.textLight}
                     keyboardType="decimal-pad"
@@ -204,9 +206,9 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                   />
                 </View>
                 <View style={[styles.field, styles.fieldHalf]}>
-                  <Text style={styles.label}>Taller</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary }]}>Taller</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                     placeholder="Ej: Servicio XYZ"
                     placeholderTextColor={colors.textLight}
                     value={taller}
@@ -215,9 +217,9 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <TouchableOpacity style={[styles.button, { backgroundColor: colors.primary }]} onPress={handleSave}>
                 <Ionicons name="checkmark-circle-outline" size={22} color={colors.white} />
-                <Text style={styles.buttonText}>Guardar</Text>
+                <Text style={[styles.buttonText, { color: colors.white }]}>Guardar</Text>
               </TouchableOpacity>
             </ScrollView>
 
@@ -227,13 +229,13 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               >
                 <Pressable style={styles.pickerOverlay} onPress={closeTipoPicker}>
-                  <Pressable style={styles.pickerSheet} onPress={() => {}}>
-                    <Text style={styles.pickerTitle}>Seleccionar tipo</Text>
+                  <Pressable style={[styles.pickerSheet, { backgroundColor: colors.surface }]} onPress={() => {}}>
+                    <Text style={[styles.pickerTitle, { color: colors.textPrimary, borderBottomColor: colors.border }]}>Seleccionar tipo</Text>
 
-                    <View style={styles.searchContainer}>
+                    <View style={[styles.searchContainer, { backgroundColor: colors.background }]}>
                       <Ionicons name="search" size={18} color={colors.textSecondary} style={styles.searchIcon} />
                       <TextInput
-                        style={styles.searchInput}
+                        style={[styles.searchInput, { color: colors.textPrimary }]}
                         placeholder="Buscar tipo..."
                         placeholderTextColor={colors.textLight}
                         value={searchText}
@@ -249,7 +251,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                     {showNewTipoInput ? (
                       <View style={styles.newTipoSection}>
                         <TextInput
-                          style={styles.newTipoInput}
+                          style={[styles.newTipoInput, { backgroundColor: colors.background, borderColor: colors.border, color: colors.textPrimary }]}
                           placeholder="Nombre del nuevo tipo"
                           placeholderTextColor={colors.textLight}
                           value={newTipoName}
@@ -258,16 +260,16 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                         />
                         <View style={styles.newTipoActions}>
                           <TouchableOpacity
-                            style={styles.newTipoCancel}
+                            style={[styles.newTipoCancel, { borderColor: colors.border }]}
                             onPress={() => {
                               setShowNewTipoInput(false);
                               setNewTipoName('');
                             }}
                           >
-                            <Text style={styles.newTipoCancelText}>Cancelar</Text>
+                            <Text style={[styles.newTipoCancelText, { color: colors.textSecondary }]}>Cancelar</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
-                            style={styles.newTipoSave}
+                            style={[styles.newTipoSave, { backgroundColor: colors.primary }]}
                             onPress={async () => {
                               const name = newTipoName.trim();
                               if (!name) return;
@@ -281,7 +283,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                             }}
                           >
                             <Ionicons name="checkmark" size={18} color={colors.white} />
-                            <Text style={styles.newTipoSaveText}>Guardar</Text>
+                            <Text style={[styles.newTipoSaveText, { color: colors.white }]}>Guardar</Text>
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -294,7 +296,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                           <TouchableOpacity
                             style={[
                               styles.pickerOption,
-                              item === tipo && styles.pickerOptionActive,
+                              item === tipo && [styles.pickerOptionActive, { backgroundColor: colors.background }],
                             ]}
                             onPress={() => {
                               setTipo(item);
@@ -304,7 +306,7 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                             <Text
                               style={[
                                 styles.pickerOptionText,
-                                item === tipo && styles.pickerOptionTextActive,
+                                item === tipo && [styles.pickerOptionTextActive, { color: colors.primary }],
                               ]}
                             >
                               {item}
@@ -316,11 +318,11 @@ export default function MantenimientoForm({ visible, onClose, vehiculoId, ultimo
                         )}
                         ListFooterComponent={() => (
                           <TouchableOpacity
-                            style={styles.addTipoButton}
+                            style={[styles.addTipoButton, { borderTopColor: colors.border }]}
                             onPress={() => setShowNewTipoInput(true)}
                           >
                             <Ionicons name="add-circle-outline" size={20} color={colors.secondary} />
-                            <Text style={styles.addTipoButtonText}>Agregar nuevo tipo</Text>
+                            <Text style={[styles.addTipoButtonText, { color: colors.secondary }]}>Agregar nuevo tipo</Text>
                           </TouchableOpacity>
                         )}
                       />
@@ -346,7 +348,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: '90%',
@@ -356,14 +357,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
     alignSelf: 'center',
     marginTop: spacing.sm,
     marginBottom: spacing.sm,
   },
   title: {
     ...typography.h3,
-    color: colors.textPrimary,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
@@ -383,18 +382,14 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     fontWeight: '500',
   },
   input: {
     ...typography.body,
-    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: 14,
-    color: colors.textPrimary,
   },
   textArea: {
     minHeight: 80,
@@ -406,7 +401,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   button: {
-    backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -418,7 +412,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     ...typography.button,
-    color: colors.white,
   },
   pickerOverlay: {
     flex: 1,
@@ -426,7 +419,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   pickerSheet: {
-    backgroundColor: colors.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingVertical: spacing.md,
@@ -435,11 +427,9 @@ const styles = StyleSheet.create({
   },
   pickerTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
     textAlign: 'center',
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
     marginHorizontal: spacing.lg,
   },
   pickerOption: {
@@ -449,21 +439,16 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: spacing.lg,
   },
-  pickerOptionActive: {
-    backgroundColor: colors.background,
-  },
+  pickerOptionActive: {},
   pickerOptionText: {
     ...typography.body,
-    color: colors.textPrimary,
   },
   pickerOptionTextActive: {
-    color: colors.primary,
     fontWeight: '600',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background,
     borderRadius: 10,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.sm,
@@ -477,7 +462,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     ...typography.body,
-    color: colors.textPrimary,
     paddingVertical: 0,
   },
   newTipoSection: {
@@ -487,13 +471,10 @@ const styles = StyleSheet.create({
   },
   newTipoInput: {
     ...typography.body,
-    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 10,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
-    color: colors.textPrimary,
   },
   newTipoActions: {
     flexDirection: 'row',
@@ -505,24 +486,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   newTipoCancelText: {
     ...typography.body,
-    color: colors.textSecondary,
   },
   newTipoSave: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: colors.primary,
     paddingVertical: 10,
     paddingHorizontal: spacing.lg,
     borderRadius: 10,
   },
   newTipoSaveText: {
     ...typography.button,
-    color: colors.white,
   },
   addTipoButton: {
     flexDirection: 'row',
@@ -532,12 +509,10 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     marginTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
     marginHorizontal: spacing.lg,
   },
   addTipoButtonText: {
     ...typography.body,
-    color: colors.secondary,
     fontWeight: '600',
   },
 });

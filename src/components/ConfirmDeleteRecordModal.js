@@ -8,9 +8,11 @@ import {
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing } from '../theme';
+import { typography, spacing } from '../theme';
+import { useTheme } from '../context/ThemeContext';
 
 export default function ConfirmDeleteRecordModal({ visible, recordId, tipo, info, onClose, onConfirm }) {
+  const { colors } = useTheme();
   const [input, setInput] = useState('');
   const [checked, setChecked] = useState(false);
 
@@ -32,26 +34,33 @@ export default function ConfirmDeleteRecordModal({ visible, recordId, tipo, info
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
       <View style={styles.overlay}>
-        <View style={styles.modal}>
+        <View style={[styles.modal, { backgroundColor: colors.surface }]}>
           <View style={styles.header}>
             <Ionicons name="warning-outline" size={36} color={colors.error} />
-            <Text style={styles.title}>Eliminar registro</Text>
+            <Text style={[styles.title, { color: colors.error }]}>Eliminar registro</Text>
           </View>
 
-          <View style={styles.infoBox}>
+          <View style={[styles.infoBox, { backgroundColor: colors.background }]}>
             <Ionicons name="information-circle-outline" size={18} color={colors.secondary} />
-            <Text style={styles.infoText}>{info}</Text>
+            <Text style={[styles.infoText, { color: colors.textPrimary }]}>{info}</Text>
           </View>
 
-          <Text style={styles.description}>
+          <Text style={[styles.description, { color: colors.textSecondary }]}>
             Esta acción no se puede deshacer. Para confirmar, escribe{' '}
-            <Text style={styles.bold}>{tipo}</Text> y acepta la confirmación.
+            <Text style={[styles.bold, { color: colors.textPrimary }]}>{tipo}</Text> y acepta la confirmación.
           </Text>
 
           <View style={styles.field}>
-            <Text style={styles.label}>Escribe "{tipo}" para confirmar</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Escribe "{tipo}" para confirmar</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.background,
+                  borderColor: colors.border,
+                  color: colors.textPrimary,
+                },
+              ]}
               placeholder={tipo}
               placeholderTextColor={colors.textLight}
               value={input}
@@ -68,22 +77,26 @@ export default function ConfirmDeleteRecordModal({ visible, recordId, tipo, info
               size={22}
               color={checked ? colors.error : colors.textLight}
             />
-            <Text style={styles.checkLabel}>
+            <Text style={[styles.checkLabel, { color: colors.textPrimary }]}>
               Confirmo que deseo eliminar este registro
             </Text>
           </TouchableOpacity>
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleClose}>
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            <TouchableOpacity style={[styles.cancelButton, { borderColor: colors.border }]} onPress={handleClose}>
+              <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.deleteButton, !puedeEliminar && styles.deleteButtonDisabled]}
+              style={[
+                styles.deleteButton,
+                { backgroundColor: colors.error },
+                !puedeEliminar && styles.deleteButtonDisabled,
+              ]}
               onPress={handleEliminar}
               disabled={!puedeEliminar}
             >
               <Ionicons name="trash-outline" size={18} color={colors.white} />
-              <Text style={styles.deleteButtonText}>Eliminar</Text>
+              <Text style={[styles.deleteButtonText, { color: colors.white }]}>Eliminar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -101,7 +114,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   modal: {
-    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: spacing.xl,
     width: '100%',
@@ -114,49 +126,40 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.h2,
-    color: colors.error,
   },
   infoBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    backgroundColor: colors.background,
     borderRadius: 10,
     padding: spacing.md,
   },
   infoText: {
     ...typography.body,
-    color: colors.textPrimary,
     flex: 1,
     fontWeight: '500',
   },
   description: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
   bold: {
     fontWeight: '700',
-    color: colors.textPrimary,
   },
   field: {
     gap: spacing.xs,
   },
   label: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     fontWeight: '500',
   },
   input: {
     ...typography.body,
-    backgroundColor: colors.background,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 10,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
-    color: colors.textPrimary,
     textAlign: 'center',
     letterSpacing: 2,
   },
@@ -168,7 +171,6 @@ const styles = StyleSheet.create({
   },
   checkLabel: {
     ...typography.bodySmall,
-    color: colors.textPrimary,
     flex: 1,
   },
   buttonRow: {
@@ -181,13 +183,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 10,
     paddingVertical: 14,
   },
   cancelButtonText: {
     ...typography.button,
-    color: colors.textSecondary,
   },
   deleteButton: {
     flex: 1,
@@ -195,7 +195,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
-    backgroundColor: colors.error,
     borderRadius: 10,
     paddingVertical: 14,
   },
@@ -204,6 +203,5 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     ...typography.button,
-    color: colors.white,
   },
 });

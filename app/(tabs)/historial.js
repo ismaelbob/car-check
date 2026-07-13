@@ -13,7 +13,8 @@ import CargaCombustibleCard from '../../src/components/CargaCombustibleCard';
 import AddRecordSheet from '../../src/components/AddRecordSheet';
 import MantenimientoForm from '../../src/components/MantenimientoForm';
 import CargaCombustibleForm from '../../src/components/CargaCombustibleForm';
-import { colors, typography, spacing } from '../../src/theme';
+import { typography, spacing } from '../../src/theme';
+import { useTheme } from '../../src/context/ThemeContext';
 
 const TABS = ['Mantenimientos', 'Combustible'];
 
@@ -25,6 +26,8 @@ export default function HistorialScreen() {
     cargasCombustible,
     cargarHistorial,
   } = useVehiculos();
+
+  const { colors } = useTheme();
 
   const [tabActivo, setTabActivo] = useState(0);
   const [sheetVisible, setSheetVisible] = useState(false);
@@ -53,10 +56,10 @@ export default function HistorialScreen() {
 
   if (!vehiculo) {
     return (
-      <View style={styles.emptyContainer}>
+      <View style={[styles.emptyContainer, { backgroundColor: colors.background }]}>
         <Ionicons name="time-outline" size={80} color={colors.textLight} />
-        <Text style={styles.emptyTitle}>Sin vehículo activo</Text>
-        <Text style={styles.emptySubtitle}>
+        <Text style={[styles.emptyTitle, { color: colors.primary }]}>Sin vehículo activo</Text>
+        <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
           Agrega un vehículo en Inicio para ver tu historial
         </Text>
       </View>
@@ -64,28 +67,28 @@ export default function HistorialScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.vehicleHeader}>
-        <View style={styles.vehicleIcon}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.vehicleHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={[styles.vehicleIcon, { backgroundColor: colors.background }]}>
           <Ionicons name="car-sport-outline" size={20} color={colors.primary} />
         </View>
         <View>
-          <Text style={styles.vehicleName}>
+          <Text style={[styles.vehicleName, { color: colors.textPrimary }]}>
             {vehiculo.marca} {vehiculo.modelo}
           </Text>
-          <Text style={styles.vehiclePlate}>{vehiculo.placa}</Text>
+          <Text style={[styles.vehiclePlate, { color: colors.textSecondary }]}>{vehiculo.placa}</Text>
         </View>
       </View>
 
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { backgroundColor: colors.surface }]}>
         {TABS.map((tab, index) => (
           <TouchableOpacity
             key={tab}
-            style={[styles.tab, index === tabActivo && styles.tabActive]}
+            style={[styles.tab, index === tabActivo && { backgroundColor: colors.primary }]}
             onPress={() => setTabActivo(index)}
           >
             <Text
-              style={[styles.tabText, index === tabActivo && styles.tabTextActive]}
+              style={[styles.tabText, { color: colors.textSecondary }, index === tabActivo && { color: colors.white, fontWeight: '600' }]}
             >
               {tab}
             </Text>
@@ -114,17 +117,17 @@ export default function HistorialScreen() {
             size={48}
             color={colors.textLight}
           />
-          <Text style={styles.emptyTabTitle}>
+          <Text style={[styles.emptyTabTitle, { color: colors.textPrimary }]}>
             No hay {tabActivo === 0 ? 'mantenimientos' : 'cargas de combustible'}
           </Text>
-          <Text style={styles.emptyTabSubtitle}>
+          <Text style={[styles.emptyTabSubtitle, { color: colors.textSecondary }]}>
             Presiona + para agregar tu primer registro
           </Text>
         </View>
       )}
 
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, { backgroundColor: colors.secondary }]}
         onPress={() => setSheetVisible(true)}
       >
         <Ionicons name="add" size={28} color={colors.white} />
@@ -158,11 +161,9 @@ export default function HistorialScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   emptyContainer: {
     flex: 1,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xl,
@@ -170,47 +171,39 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     ...typography.h2,
-    color: colors.primary,
     marginTop: spacing.md,
   },
   emptySubtitle: {
     ...typography.body,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   vehicleHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.surface,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   vehicleIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
   vehicleName: {
     ...typography.body,
-    color: colors.textPrimary,
     fontWeight: '600',
   },
   vehiclePlate: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
   },
   tabs: {
     flexDirection: 'row',
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     marginBottom: spacing.sm,
-    backgroundColor: colors.surface,
     borderRadius: 10,
     padding: 3,
   },
@@ -220,17 +213,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
   },
-  tabActive: {
-    backgroundColor: colors.primary,
-  },
   tabText: {
     ...typography.bodySmall,
-    color: colors.textSecondary,
     fontWeight: '500',
-  },
-  tabTextActive: {
-    color: colors.white,
-    fontWeight: '600',
   },
   list: {
     paddingHorizontal: spacing.lg,
@@ -245,12 +230,10 @@ const styles = StyleSheet.create({
   },
   emptyTabTitle: {
     ...typography.h3,
-    color: colors.textPrimary,
     marginTop: spacing.md,
   },
   emptyTabSubtitle: {
     ...typography.body,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   fab: {
@@ -260,7 +243,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',

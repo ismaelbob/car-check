@@ -3,11 +3,18 @@ import { TouchableOpacity, View, BackHandler } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
-import { colors, spacing } from '../../src/theme';
+import { useTheme } from '../../src/context/ThemeContext';
+import { spacing } from '../../src/theme';
+import { DarkTheme, DefaultTheme } from '@react-navigation/native';
 
 export default function TabLayout() {
   const router = useRouter();
   const pathname = usePathname();
+  const { isDark, colors } = useTheme();
+
+  const navigationTheme = isDark
+    ? { ...DarkTheme, colors: { ...DarkTheme.colors, background: colors.background, card: colors.surface } }
+    : { ...DefaultTheme, colors: { ...DefaultTheme.colors, background: colors.background, card: colors.surface } };
 
   useEffect(() => {
     const onBackPress = () => {
@@ -29,6 +36,8 @@ export default function TabLayout() {
   return (
     <Tabs
       initialRouteName="home"
+      theme={navigationTheme}
+      contentStyle={{ backgroundColor: colors.background }}
       screenOptions={{
         headerStyle: { backgroundColor: colors.primary },
         headerTintColor: colors.white,
@@ -36,7 +45,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textLight,
         tabBarStyle: {
-          backgroundColor: colors.white,
+          backgroundColor: colors.surface,
           borderTopColor: colors.border,
           paddingBottom: 6,
           paddingTop: 6,
